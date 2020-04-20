@@ -1,5 +1,4 @@
 import fs from "fs";
-import path from 'path';
 import getAcmePath from "../pathUtils";
 
 export function createChallenge(clientToken: string, accountToken: string) {

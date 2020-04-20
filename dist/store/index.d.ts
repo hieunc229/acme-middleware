@@ -1,6 +1,2 @@
-import { CertificateStore } from "./types";
-declare const CertStore: {
-    getStore: () => CertificateStore;
-    setStore: (store: CertificateStore) => void;
-};
+import CertStore from "./CertStore";
 export default CertStore;
