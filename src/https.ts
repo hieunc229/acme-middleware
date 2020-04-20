@@ -4,8 +4,8 @@ import tls from "tls";
 import { loadCert } from './certificate/loadCert';
 import { checkDefaultCert } from './certificate/defaultCert';
 
-const localCertPath = process.env.ACME_EXPRESS_LOCAL_CERT || "/acme-express/default/cert.pem";
-const localKeyPath = process.env.ACME_EXPRESS_LOCAL_KEY || "/acme-express/default/key.pem";
+const localCertPath = process.env.ACME_EXPRESS_LOCAL_CERT || "/acme-express/certs/default/cert.pem";
+const localKeyPath = process.env.ACME_EXPRESS_LOCAL_KEY || "/acme-express/certs/default/key.pem";
 const email = process.env.ACME_EXPRESS_EMAIL || "sample@notrealdomain.com";
 
 
@@ -15,13 +15,13 @@ export default function createSSLServer(app: any) {
     // checkDefaultCert(localCertPath, localKeyPath);
 
     const server = https.createServer({
-        SNICallback: (servername, cb) => {    
-            
+        SNICallback: (servername, cb) => {
+
             if (servername === "localhost") {
                 localCertCB(cb);
                 return;
             }
-            
+
             loadCert(servername, email)
                 .then(ctx => {
                     cb(null, ctx)

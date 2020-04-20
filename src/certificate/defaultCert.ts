@@ -11,15 +11,16 @@ export async function checkDefaultCert(certhPath: string, keyPath: string) {
         // JavaScript execution. Will use native Node.js 10.12.0+ API if possible.
         const privateKey = await acme.forge.createPrivateKey();
 
+        const publicKey = acme.forge.createPublicKey(privateKey);
+
         const [certificateKey, certificateCsr] = await acme.openssl.createCsr({
             commonName: 'localhost',
             altNames: ['localhost']
         });
 
-        acme.openssl.createPublicKey
-
+        fs.writeFileSync("./generatedPrivateKey.pem", privateKey);
         fs.writeFileSync(certhPath, certificateKey);
-        fs.writeFileSync(keyPath, privateKey);
+        fs.writeFileSync(keyPath, publicKey);
     }
 }
 

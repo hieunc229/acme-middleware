@@ -15,6 +15,7 @@ export default async function createCert(opts: Props) {
   const client = await getClient(email);
 
   let identifiers = [{ type: 'dns', value: domain }];
+  
   altNames && (identifiers = identifiers.concat(
     altNames.map(value => {
       return { type: 'dns', value };
