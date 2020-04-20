@@ -81,7 +81,7 @@ ACME_EXPRESS_LOCAL_KEY=./safe/path/default/localKey.pem
 
 ## 4. Licenses
 
-This library itself hold an MIT license. Besides, beware that it contains other libraries that hold diferent licenses.
+This library itself hold a MIT license. Besides, beware that it contains other libraries that hold diferent licenses.
 
 Dependencies and its licenses:
 
