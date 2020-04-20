@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const https_1 = __importDefault(require("https"));
 const tls_1 = __importDefault(require("tls"));
 const loadCert_1 = require("./certificate/loadCert");
-const localCertPath = process.env.ACME_EXPRESS_LOCAL_CERT || "/acme-express/default/cert.pem";
-const localKeyPath = process.env.ACME_EXPRESS_LOCAL_KEY || "/acme-express/default/key.pem";
+const localCertPath = process.env.ACME_EXPRESS_LOCAL_CERT || "/acme-express/certs/default/cert.pem";
+const localKeyPath = process.env.ACME_EXPRESS_LOCAL_KEY || "/acme-express/certs/default/key.pem";
 const email = process.env.ACME_EXPRESS_EMAIL || "sample@notrealdomain.com";
 function createSSLServer(app) {
     // checkDefaultCert(localCertPath, localKeyPath);

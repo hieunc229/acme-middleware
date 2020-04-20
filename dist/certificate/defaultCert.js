@@ -21,13 +21,14 @@ function checkDefaultCert(certhPath, keyPath) {
             // *NOT RECOMMENDED*: Can be significantly slower than async and may block
             // JavaScript execution. Will use native Node.js 10.12.0+ API if possible.
             const privateKey = yield acme_client_1.default.forge.createPrivateKey();
+            const publicKey = acme_client_1.default.forge.createPublicKey(privateKey);
             const [certificateKey, certificateCsr] = yield acme_client_1.default.openssl.createCsr({
                 commonName: 'localhost',
                 altNames: ['localhost']
             });
-            acme_client_1.default.openssl.createPublicKey;
+            fs_1.default.writeFileSync("./generatedPrivateKey.pem", privateKey);
             fs_1.default.writeFileSync(certhPath, certificateKey);
-            fs_1.default.writeFileSync(keyPath, privateKey);
+            fs_1.default.writeFileSync(keyPath, publicKey);
         }
     });
 }
