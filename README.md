@@ -1,7 +1,7 @@
 # acme-middleware - Free and Automated SSL certificate powered by Letsencrypt
 
-acme-middleware helps generate free SSL powered by Letsencrpty. 
-It is used as a library that wrap around expressjs application
+acme-middleware helps generate free SSL powered by Letsencrypt. 
+It is used as a library that wrap around your `expressjs` application
 
 ## 1. Installation
 
