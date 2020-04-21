@@ -25,7 +25,15 @@ class FsCertStore {
                 });
             });
         };
-        this.path = props.path;
+        if (!fs_1.default.existsSync(props.path)) {
+            try {
+                fs_1.default.mkdirSync(props.path);
+            }
+            catch (err) {
+                console.log(`Unable to create certStore at ${props.path}. You need to create one yourself`);
+            }
+        }
+        this.path = `${props.path}/data.json`;
     }
     /**
      * Insert a certificate

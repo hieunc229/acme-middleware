@@ -20,7 +20,8 @@ const utils_1 = require("./utils");
 const utils_2 = require("../store/utils");
 function createCert(opts) {
     return __awaiter(this, void 0, void 0, function* () {
-        let { email, domain, altNames } = opts;
+        let { domain, altNames, challengeOnly } = opts;
+        let email = opts.email || process.env.ACME_EXPRESS_EMAIL || "sample@notrealdomain.com";
         const client = yield account_1.getClient(email);
         let identifiers = [{ type: 'dns', value: domain }];
         altNames && (identifiers = identifiers.concat(altNames.map(value => {
@@ -34,6 +35,19 @@ function createCert(opts) {
         * All items require at least one satisfied challenge before order can be completed.
         */
         const authorizations = yield client.getAuthorizations(order);
+        if (challengeOnly) {
+            let challenges = [];
+            authorizations.forEach(auth => {
+                if (auth.status === "pending") {
+                    challenges = challenges.concat(auth.challenges);
+                }
+            });
+            yield challenges.forEach((item, i) => __awaiter(this, void 0, void 0, function* () {
+                // @ts-ignore
+                challenges[i].keyAuthorization = yield client.getChallengeKeyAuthorization(item);
+            }));
+            return { challenges };
+        }
         const promises = authorizations.map((authz) => __awaiter(this, void 0, void 0, function* () {
             /**
              * challenges / authz.challenges

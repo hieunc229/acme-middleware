@@ -6,13 +6,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const https_1 = __importDefault(require("./https"));
 const pathUtils_1 = __importDefault(require("./pathUtils"));
+const createCertHandler_1 = require("./handlers/createCertHandler");
+const utils_1 = require("./utils");
+const store_1 = __importDefault(require("./store"));
 class AcmeExpress {
-    constructor(app) {
+    constructor(props) {
         this.initate = () => {
+            utils_1.dirCheckup();
             this.app.use('/.well-known/acme-challenge', express_1.default.static(pathUtils_1.default('acme-challenge')));
+            this.app.get("/_init-cert-wildcard", createCertHandler_1.createCertWithWildcardHandler);
         };
-        this.app = app;
-        this.https = https_1.default(app);
+        this.app = props.app;
+        this.https = https_1.default(props.app);
+        props.store && (store_1.default.setStore(props.store));
         this.initate();
     }
     getApp() {
