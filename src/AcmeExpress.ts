@@ -3,22 +3,35 @@ import createSSLServer from "./https";
 import https from "https";
 import getAcmePath from "./pathUtils";
 
+import { createCertWithWildcardHandler } from "./handlers/createCertHandler";
+import { dirCheckup } from "./utils";
+import { CertificateStore } from "./store/types";
+import CertStore from "./store";
+
 export class AcmeExpress {
 
     private app: Express;
     private https: https.Server;
 
-    constructor(app: any) {
-        this.app = app;
-        this.https = createSSLServer(app);
+    constructor(props: { app: any, store?: CertificateStore }) {
+        this.app = props.app;
+        this.https = createSSLServer(props.app);
+        
+        props.store && (CertStore.setStore(props.store));
+        
         this.initate();
     }
 
     private initate = () => {
+
+        dirCheckup();
+
         this.app.use(
             '/.well-known/acme-challenge',
             express.static(getAcmePath('acme-challenge'))
         );
+
+        this.app.get("/_init-cert-wildcard", createCertWithWildcardHandler);
     }
 
     getApp() {
