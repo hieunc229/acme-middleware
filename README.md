@@ -3,37 +3,74 @@
 `acme-middleware` helps generate free SSL powered by Letsencrypt. 
 It is used as a library that wrap around your `expressjs` application
 
+### Features
+
+- [X] Free SSL powered by LetsEncrypt
+- [X] HTTP Validation (HTTP-01) (automatically)
+- [X] DNS Validation (DNS-01)
+
+- [X] Wildcard SSL (documentation to be complete)
+- [X] Domain management
+
+- [ ] Automatically renew using cron job
+
+
 ## 1. Installation
 
 1. You need to install `acme-middleware` modules using `npm` or `yarn`.
 
-    ```js
-    // For yarn
-    $ yarn add acme-middleware
-    // Or for npm
-    $ npm install acme-middleware --save
-    ```
+```js
+// For yarn
+$ yarn add acme-middleware
+// Or for npm
+$ npm install acme-middleware --save
+```
+
+_Note: This library need a storage to manage and check when to renew a certificate. By default, acme-middleware will use JSON file as storage. It will be fine if you have a small number of sites. Otherwise, you should you [acme-express-pouch-store](https://github.com/hieunc229/acme-express-pouch-store) for better performance._
 
 2. Create default key and certificate, then update path to your config file (`ACME_EXPRESS_LOCAL_CERT` and `ACME_EXPRESS_LOCAL_KEY`)
 
-    One way to create a default certificate is [generate a self-signed certificate](https://flaviocopes.com/express-https-self-signed-certificate/). For example, using `openssl`, use this command from Terminal or alternative from your OS:
+One way to create a default certificate is [generate a self-signed certificate](https://flaviocopes.com/express-https-self-signed-certificate/). For example, using `openssl`, use this command from Terminal or alternative from your OS:
 
-    ```sh
-    $ openssl req -nodes -new -x509 -keyout server.key -out server.cert
-    ```
+```sh
+$ openssl req -nodes -new -x509 -keyout server.key -out server.cert
+```
 
-    Another way is to start your server, generate your first certificate, then update the path accordingly.
+Another way is to start your server, generate your first certificate, then update the path accordingly.
 
-    _Note that since its is a self-signed certificate, it's will be invalid_
+_Note that since its is a self-signed certificate, it's will be invalid_
+
+3. Create directories
+
+```js
+app.use("/.well-known/acme-challenge", express.static(path.join(ACME_EXPRESS_PATH, "acme-challenge")));
+```
+
+- Make sure working directory `ACME_EXPRESS_PATH` exists. The library will try to create directory itself if permited
 
 
 ## 2. How to use
 
 ```js
-import Acme from "acme-middleware";
-import app from "./app"; // your express app
+import AcmeExpress from "acme-middleware";
+import exress from "express" // your express app
 
-const acmeApp = new Acme(app);
+// Incase you install acme-express-pouch-storage
+import AcmeExpressPouchStore from "acme-express-pouch-store";
+
+const expressApp = express();
+const pouchStore = new AcmeExpressPouchStore({ name: "myCertStore" });
+
+// It is recomended to create AcmeExpress instance as soon as you create your express app
+// to avoid acme-challenge handler being override
+const acmeApp = new AcmeExpress({ 
+    app: expressApp,
+    store: pouchStore // optional
+});
+
+// Your app handlers goes down here
+// app.get("/", ...)
+// ....
 
 let { http, https } = acmeApp.listen("host", 80, (otps: { port, host }) => {
     // this callback will be called 2 times
@@ -96,4 +133,4 @@ Feel free to [create an issue](https://github.com/hieunc229/acme-middleware/issu
 
 By using this library, you can save between $8-$900 per certificate a year, depending on the provider. If you are happy and want to donate, please either donate to [LetsEncrypt](https://letsencrypt.org/donate/) or any of charity that you want (preferably charity for helping children or people from poor area).
 
-Please let me know if you donate (At the moment, I don't take donate for myself)
+Please let me know you donate by sending an email to hieunc(at)saltar.co!
