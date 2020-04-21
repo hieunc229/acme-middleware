@@ -3,7 +3,7 @@ import createCert from './createCert';
 import certificate from './certificate';
 import { getDomainName } from "./domainUtils";
 
-export async function loadCert(servername: string, email: string): Promise<tls.SecureContext> {
+export async function loadCert(servername: string, email?: string): Promise<tls.SecureContext> {
 
     let domain = getDomainName(servername);
 

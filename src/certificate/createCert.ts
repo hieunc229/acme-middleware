@@ -5,17 +5,20 @@ import CertStore from "../store";
 import { getClient } from "./account";
 import { challengeRemoveFn, challengeCreateFn } from "./utils";
 import { getFutureDate } from "../store/utils";
+import { Challenge } from "acme-client/types/rfc8555";
 
 
-type Props = { domain: string, altNames?: string[], email: string };
+type Props = { domain: string, altNames?: string[], email?: string, challengeOnly?: boolean };
 
 export default async function createCert(opts: Props) {
 
-  let { email, domain, altNames } = opts;
+  let { domain, altNames, challengeOnly } = opts;
+  let email = opts.email || process.env.ACME_EXPRESS_EMAIL || "sample@notrealdomain.com";
+
   const client = await getClient(email);
 
   let identifiers = [{ type: 'dns', value: domain }];
-  
+
   altNames && (identifiers = identifiers.concat(
     altNames.map(value => {
       return { type: 'dns', value };
@@ -32,6 +35,23 @@ export default async function createCert(opts: Props) {
   */
 
   const authorizations = await client.getAuthorizations(order);
+
+  if (challengeOnly) {
+    let challenges: Challenge[] = [];
+
+    authorizations.forEach(auth => {
+      if (auth.status === "pending") {
+        challenges = challenges.concat(auth.challenges);
+      }
+    })
+    
+    await challenges.forEach(async (item,i) => {
+      // @ts-ignore
+      challenges[i].keyAuthorization = await client.getChallengeKeyAuthorization(item);
+    })
+    
+    return { challenges };
+  }
 
   const promises = authorizations.map(async (authz) => {
     /**

@@ -6,7 +6,17 @@ export class FsCertStore {
     private path: string;
 
     constructor(props: { path: string }) {
-        this.path = props.path;
+
+        if (!fs.existsSync(props.path)) {
+
+            try {
+                fs.mkdirSync(props.path);
+            } catch (err) {
+
+                console.log(`Unable to create certStore at ${props.path}. You need to create one yourself`)
+            }
+        }
+        this.path = `${props.path}/data.json`;
     }
 
     /**
