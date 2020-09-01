@@ -23,7 +23,7 @@ function checkDefaultCert(certhPath, keyPath) {
             // JavaScript execution. Will use native Node.js 10.12.0+ API if possible.
             const privateKey = yield acme_client_1.default.forge.createPrivateKey();
             const publicKey = acme_client_1.default.forge.createPublicKey(privateKey);
-            const [certificateKey, certificateCsr] = yield acme_client_1.default.forge.createCsr({
+            const [certificateKey, certificateCsr] = yield acme_client_1.default.openssl.createCsr({
                 commonName: 'localhost',
                 altNames: ['localhost']
             });

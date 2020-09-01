@@ -12,24 +12,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadCert = void 0;
-const tls_1 = __importDefault(require("tls"));
-const createCert_1 = __importDefault(require("./createCert"));
-const certificate_1 = __importDefault(require("./certificate"));
-const domainUtils_1 = require("./domainUtils");
-function loadCert(servername, email) {
+exports.createCertWithWildcardHandler = void 0;
+const certificate_1 = __importDefault(require("../certificate/certificate"));
+const createCert_1 = __importDefault(require("../certificate/createCert"));
+function createCertWithWildcardHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        let domain = domainUtils_1.getDomainName(servername);
+        let domain = req.query.domain || req.hostname;
         const exists = certificate_1.default.exists(domain, `key.pem`);
         if (!exists) {
-            let altNames;
-            servername === domain || servername.indexOf("_init-cert-wildcard") === 0 && (altNames = [`*.${domain}`]);
-            yield createCert_1.default({ domain, email, altNames });
+            let challenges = yield createCert_1.default({
+                domain,
+                altNames: [`*.${domain}`],
+                challengeOnly: !!req.query.process
+            });
+            challenges ? res.status(200).json({
+                status: 'pending',
+                type: 'txt-record',
+                value: `_acme-challenge.${domain}`,
+                info: challenges
+            }) : res.status(500).json({
+                status: 'error',
+                message: 'Unable to process. Please conact admin'
+            });
+            return;
         }
-        return tls_1.default.createSecureContext({
-            key: certificate_1.default.load(domain, `key.pem`),
-            cert: certificate_1.default.load(domain, `cert.pem`)
+        res.status(409).json({
+            status: 'already_exists'
         });
     });
 }
-exports.loadCert = loadCert;
+exports.createCertWithWildcardHandler = createCertWithWildcardHandler;

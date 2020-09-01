@@ -13,7 +13,7 @@ export async function checkDefaultCert(certhPath: string, keyPath: string) {
 
         const publicKey = acme.forge.createPublicKey(privateKey);
 
-        const [certificateKey, certificateCsr] = await acme.openssl.createCsr({
+        const [certificateKey, certificateCsr] = await acme.forge.createCsr({
             commonName: 'localhost',
             altNames: ['localhost']
         });

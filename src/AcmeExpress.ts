@@ -31,6 +31,8 @@ export class AcmeExpress {
             express.static(getAcmePath('acme-challenge'))
         );
 
+        // Use `/_init-cert-wildcard` to request challenges
+        // Use /_init-cert-wildcard?process=true to submit
         this.app.get("/_init-cert-wildcard", createCertWithWildcardHandler);
     }
 
