@@ -116,7 +116,20 @@ ACME_EXPRESS_LOCAL_CERT=./safe/path/default/localCert.pem
 ACME_EXPRESS_LOCAL_KEY=./safe/path/default/localKey.pem
 ```
 
-## 4. Licenses
+## 4. Using automate wildcard
+
+On your browser, 
+
+1. Visit `http://domain.com/_init-cert-wildcard` or `http://domain.com/_init-cert-wildcard?force=true` to force replacing existing certs
+2. It will return some JSON data. You'll need to create TXT DNS valudate
+    - Domain: use `domain` value (`_acme-challenge.domain.com`)
+    - Value: use `keyAuthorization` in `dns-01` value
+    Then wait for 5 mins and check the txt record if it show up on `_acme-challenge.domain.com` using `dig txt _acme-challenge.domain.com`
+3. Visit `http://domain.com/_init-cert-wildcard?process=true` to confirm and get certificate
+    - If it return `already_exists`, use `http://domain.com/_init-cert-wildcard?process=true&force=true`
+    - If its keep waiting (not returning anything), good chance the process is completed. Wait for 1 minute then visit `https://domain.com`.
+
+## 5. Licenses
 
 This library itself hold a MIT license. Besides, beware that it contains other libraries that hold diferent licenses.
 
@@ -125,11 +138,11 @@ Dependencies and its licenses:
 - [acme-client](https://github.com/publishlab/node-acme-client): [MIT](https://github.com/publishlab/node-acme-client/blob/master/LICENSE)
 - [acme-express-pouch-store](https://github.com/hieunc229/acme-express-pouch-store): [MIT, Apache 2.0](https://github.com/hieunc229/acme-express-pouch-store/tree/master/LICENSES)
 
-## 5. Help and contribute
+## 6. Help and contribute
 
 Feel free to [create an issue](https://github.com/hieunc229/acme-middleware/issues/new) to ask, give feedback and contribute
 
-## 6. Donate
+## 7. Donate
 
 By using this library, you can save between $8-$900 per certificate a year, depending on the provider. If you are happy and want to donate, please either donate to [LetsEncrypt](https://letsencrypt.org/donate/) or any of charity that you want (preferably charity for helping children or people from poor area).
 
