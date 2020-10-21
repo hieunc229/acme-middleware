@@ -19,7 +19,10 @@ function createCertWithWildcardHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         let domain = req.query.domain || req.hostname;
         const exists = certificate_1.default.exists(domain, `key.pem`);
-        if (!exists && !req.query.force) {
+        if (!exists || req.query.force === "true") {
+            if (exists) {
+                yield certificate_1.default.remove(domain);
+            }
             let challenges = yield createCert_1.default({
                 domain,
                 altNames: [`*.${domain}`],

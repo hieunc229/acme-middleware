@@ -1,6 +1,6 @@
 {
   "name": "acme-middleware",
-  "version": "0.0.94",
+  "version": "0.0.97",
   "description": "Free SSL certificate for Express using Letsencrypt",
   "main": "dist/index.js",
   "types": "dist/index.d.js",

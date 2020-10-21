@@ -33,6 +33,7 @@ export class AcmeExpress {
 
         // Use `/_init-cert-wildcard` to request challenges
         // Use /_init-cert-wildcard?process=true to submit
+        // Use /_init-cert-wildcard?force=true to create or replace
         this.app.get("/_init-cert-wildcard", createCertWithWildcardHandler);
     }
 

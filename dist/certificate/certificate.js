@@ -5,6 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = __importDefault(require("fs"));
 const pathUtils_1 = __importDefault(require("../pathUtils"));
+function remove(domain) {
+    fs_1.default.unlinkSync(pathUtils_1.default(domain, `key.pem`));
+    fs_1.default.unlinkSync(pathUtils_1.default(domain, `cert.pem`));
+}
 function save(domain, fileName, content) {
     const dir = pathUtils_1.default(domain);
     if (!fs_1.default.existsSync(dir)) {
@@ -25,6 +29,7 @@ function exists(domain, fileName) {
 const certificate = {
     save,
     load,
-    exists
+    exists,
+    remove
 };
 exports.default = certificate;
