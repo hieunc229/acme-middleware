@@ -8,7 +8,12 @@ export async function createCertWithWildcardHandler(req: Request, res: Response)
     let domain = req.query.domain as string || req.hostname;
     const exists = certificate.exists(domain, `key.pem`);
     
-    if (!exists && !req.query.force) {
+    if (!exists || req.query.force === "true") {
+
+        if (exists) {
+            await certificate.remove(domain);
+        }
+
        let challenges = await createCert({ 
            domain, 
            altNames: [`*.${domain}`], 

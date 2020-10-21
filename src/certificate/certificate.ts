@@ -1,6 +1,10 @@
 import fs from "fs";
 import getAcmePath from "../pathUtils";
 
+function remove(domain: string) {
+    fs.unlinkSync(getAcmePath(domain, `key.pem`))
+    fs.unlinkSync(getAcmePath(domain, `cert.pem`))
+}
 
 function save(domain: string, fileName: string, content: Buffer | string) {
 
@@ -30,7 +34,8 @@ function exists(domain: string, fileName: string) {
 const certificate = {
     save,
     load,
-    exists
+    exists,
+    remove
 }
 
 export default certificate;
