@@ -11,9 +11,15 @@ export declare class AcmeExpress {
     });
     private initate;
     getApp(): express.Express;
+    /**
+     * Start the server
+     * @param opts
+     * @param callback
+     */
     listen(opts?: {
         host?: string;
         port?: number;
+        httpsPort?: number;
     } | Function, callback?: Function): {
         http: import("http").Server;
         https: https.Server;

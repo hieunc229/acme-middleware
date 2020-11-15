@@ -16,9 +16,9 @@ export class AcmeExpress {
     constructor(props: { app: any, store?: CertificateStore }) {
         this.app = props.app;
         this.https = createSSLServer(props.app);
-        
+
         props.store && (CertStore.setStore(props.store));
-        
+
         this.initate();
     }
 
@@ -41,17 +41,25 @@ export class AcmeExpress {
         return this.app;
     }
 
-    listen(opts?: { host?: string, port?: number } | Function, callback?: Function) {
+    /**
+     * Start the server
+     * @param opts 
+     * @param callback 
+     */
+    listen(opts?: {
+        host?: string,
+        port?: number,
+        httpsPort?: number
+    } | Function, callback?: Function) {
 
-        let { host, port } = Object.assign({ host: 'localhost', port: 80 }, opts);
-
+        let { host, port, httpsPort } = Object.assign({ host: 'localhost', port: 80, httpsPort: 443 }, opts);
         let fn = (typeof opts === "function" ? opts : callback);
 
         return {
             // @ts-ignore
-            http: this.app.listen(port, host, () => fn && fn({ host, port })),
+            http: this.app.listen(port, host, () => fn && fn({ host, port, httpsPort })),
             // @ts-ignore
-            https: this.https.listen(443, host, () => fn && fn({ host, port: 443 }))
+            https: this.https.listen(httpsPort, host, () => fn && fn({ host, port: httpsPort }))
         };
     }
 }

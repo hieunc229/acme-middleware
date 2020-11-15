@@ -28,14 +28,19 @@ class AcmeExpress {
     getApp() {
         return this.app;
     }
+    /**
+     * Start the server
+     * @param opts
+     * @param callback
+     */
     listen(opts, callback) {
-        let { host, port } = Object.assign({ host: 'localhost', port: 80 }, opts);
+        let { host, port, httpsPort } = Object.assign({ host: 'localhost', port: 80, httpsPort: 443 }, opts);
         let fn = (typeof opts === "function" ? opts : callback);
         return {
             // @ts-ignore
             http: this.app.listen(port, host, () => fn && fn({ host, port })),
             // @ts-ignore
-            https: this.https.listen(443, host, () => fn && fn({ host, port: 443 }))
+            https: this.https.listen(httpsPort, host, () => fn && fn({ host, port: httpsPort }))
         };
     }
 }

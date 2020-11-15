@@ -72,11 +72,19 @@ const acmeApp = new AcmeExpress({
 // app.get("/", ...)
 // ....
 
-let { http, https } = acmeApp.listen("host", 80, (otps: { port, host }) => {
+
+
+const configs = {
+    host: HOST, // "localhost", "0.0.0.0"
+    port: PORT,
+    httpsPort: 443
+}
+
+let { http, https } = acmeApp.listen(configs, (otps) => {
     // this callback will be called 2 times
     // (1) when http server (your app) started and
     // (2) when a https server started
-    console.log(`Server started at ${host}:${port}`);
+    console.log(`Server started at ${opts.host}:${opts.port}`);
 })
 ```
 
