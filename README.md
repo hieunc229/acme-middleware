@@ -134,8 +134,8 @@ On your browser,
     - Value: use `keyAuthorization` in `dns-01` value
     Then wait for 5 mins and check the txt record if it show up on `_acme-challenge.domain.com` using `dig txt _acme-challenge.domain.com`
 3. Visit `http://domain.com/_init-cert-wildcard?process=true` to confirm and get certificate
-    - If it return `already_exists`, use `http://domain.com/_init-cert-wildcard?process=true&force=true`
-    - If its keep waiting (not returning anything), good chance the process is completed. Wait for 1 minute then visit `https://domain.com`.
+    - a. If it return `already_exists`, use `http://domain.com/_init-cert-wildcard?process=true&force=true`
+    - b. If its keep waiting (not returning anything) and you have done 3a step, good chance the process is completed. Wait for 1 minute then visit `https://domain.com`.
 
 ## 5. Licenses
 
