@@ -128,7 +128,7 @@ ACME_EXPRESS_LOCAL_KEY=./safe/path/default/localKey.pem
 
 On your browser, 
 
-1. Visit `http://domain.com/_init-cert-wildcard` or `http://domain.com/_init-cert-wildcard?force=true` to force replacing existing certs
+1. Visit `http://domain.com/_init-cert-wildcard` to initate the process
 2. It will return some JSON data. You'll need to create TXT DNS valudate
     - Domain: use `domain` value (`_acme-challenge.domain.com`)
     - Value: use `keyAuthorization` in `dns-01` value
@@ -136,6 +136,12 @@ On your browser,
 3. Visit `http://domain.com/_init-cert-wildcard?process=true` to confirm and get certificate
     - a. If it return `already_exists`, use `http://domain.com/_init-cert-wildcard?process=true&force=true`
     - b. If its keep waiting (not returning anything) and you have done 3a step, good chance the process is completed. Wait for 1 minute then visit `https://domain.com`.
+
+**Renew (or regenerate) certificate**
+
+Similar to the above steps, but added `force=true` to the URL. For example:
+- `http://domain.com/_init-cert-wildcard?force=true`
+- `http://domain.com/_init-cert-wildcard?force=true&process=true`
 
 ## 5. Licenses
 
