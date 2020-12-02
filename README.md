@@ -160,4 +160,4 @@ Feel free to [create an issue](https://github.com/hieunc229/acme-middleware/issu
 
 By using this library, you can save between $8-$900 per certificate a year, depending on the provider. If you are happy and want to donate, please either donate to [LetsEncrypt](https://letsencrypt.org/donate/) or any of charity that you want (preferably charity for helping children or people from poor area).
 
-Please let me know you donate by sending an email to hieunc(at)saltar.co!
+Please let me know you donate by sending an email to hieunc(at)inverr.com!
