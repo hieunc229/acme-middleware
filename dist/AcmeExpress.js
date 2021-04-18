@@ -38,7 +38,7 @@ class AcmeExpress {
         let fn = (typeof opts === "function" ? opts : callback);
         return {
             // @ts-ignore
-            http: this.app.listen(port, host, () => fn && fn({ host, port })),
+            http: this.app.listen(port, host, () => fn && fn({ host, port: httpPort })),
             // @ts-ignore
             https: this.https.listen(httpsPort, host, () => fn && fn({ host, port: httpsPort }))
         };

@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const https_1 = __importDefault(require("https"));
 const tls_1 = __importDefault(require("tls"));
+const fs_1 = __importDefault(require("fs"));
 const loadCert_1 = require("./certificate/loadCert");
 // import { checkDefaultCert } from './certificate/defaultCert';
 const localCertPath = process.env.ACME_EXPRESS_LOCAL_CERT || "/acme-express/certs/default/cert.pem";
@@ -32,7 +33,7 @@ function createSSLServer(app) {
 exports.default = createSSLServer;
 function localCertCB(cb) {
     cb(null, tls_1.default.createSecureContext({
-        cert: localCertPath,
-        key: localKeyPath
+        cert: fs_1.default.readFileSync(localCertPath, 'utf8'),
+        key: fs_1.default.readFileSync(localKeyPath, 'utf8')
     }));
 }

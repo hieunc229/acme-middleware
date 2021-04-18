@@ -1,6 +1,8 @@
 
 import https from 'https';
 import tls from "tls";
+import fs from "fs";
+
 import { loadCert } from './certificate/loadCert';
 // import { checkDefaultCert } from './certificate/defaultCert';
 
@@ -35,7 +37,7 @@ export default function createSSLServer(app: any) {
 
 function localCertCB(cb: any) {
     cb(null, tls.createSecureContext({
-        cert: localCertPath,
-        key: localKeyPath
+        cert: fs.readFileSync(localCertPath, 'utf8'),
+        key: fs.readFileSync(localKeyPath, 'utf8')
     }))
 }
