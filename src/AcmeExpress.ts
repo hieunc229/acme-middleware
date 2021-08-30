@@ -13,7 +13,6 @@ import { createCertWithWildcardHandler } from "./handlers/createCertHandler";
 import { renewCertWithWildcardHandler } from "./handlers/renewCertHandler";
 import { processCertWithWildcardHandler } from "./handlers/processCertHandler";
 import { infoCertWithWildcardHandler } from "./handlers/infoCertHandler";
-import { verifyCertWithWildcardHandler } from "./handlers/verifyChallangeHandler";
 
 import { listExpiredDomainHandler } from "./handlers/listExpiredDomainHandler";
 import { startup } from "./functions/startup";
@@ -30,14 +29,14 @@ export class AcmeExpress {
 
     constructor(props: {
         app: any,
-        dbPath: string,
+        dbPath?: string,
         dnsClient?: AcmeDNSClientAbstract
     }) {
 
         this.app = props.app;
         this.https = createSSLServer(props.app);
 
-        const store = new KnexCertStore(props.dbPath);
+        const store = new KnexCertStore(props.dbPath || getAcmePath("acme.db"));
         CertStore.setStore(store);
 
         props.dnsClient && DNSClient.set(props.dnsClient);
@@ -77,15 +76,12 @@ export class AcmeExpress {
         this.app.get(`${ACME_PATH}/wildcard/process`, processCertWithWildcardHandler);
 
         // Start validate and generate certificate
-        this.app.get(`${ACME_PATH}/wildcard/verify`, verifyCertWithWildcardHandler);
+        this.app.get(`${ACME_PATH}/wildcard/order`, orderInfoHandler);
 
         // Start validate and generate certificate
         this.app.get(`${ACME_PATH}/cert/create`, createCertAutoHandler);
 
-        // Start validate and generate certificate
-        this.app.get(`${ACME_PATH}/order`, orderInfoHandler);
-
-        if (process.env.ACME_EXPRESS_PRODUCTION !== "true") {
+        if (process.env.ACME_EXPRESS_PRODUCTION !== "true" || process.env.ACME_EXPRESS_ENABLE_EXPIRE_LIST  === "true") {
             // Start validate and generate certificate
             this.app.get(`${ACME_PATH}/expire`, listExpiredDomainHandler);
         }
