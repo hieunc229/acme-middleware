@@ -16,11 +16,12 @@ It is used as a library that wrap around your `expressjs` application
 
 - [1. Installation](#1-installation)
 - [2. How to use](#2-how-to-use)
-- [3. Create wildcard certificate](#3-create-wildcard-certificate)
-- [4. Enviroment variables](#4-enviroment-variables)
-- [5. APIs](#5-apis)
-- [6. Licenses](#6-apis)
-- [7. Changes](#7-changes)
+- [3. Request a certificate](#3-request-a-certificate)
+- [4. Request a wildcard certificate](#4-request-wildcard-certificate)
+- [5. Enviroment variables](#5-enviroment-variables)
+- [6. APIs](#6-apis)
+- [7. Licenses](#7-apis)
+- [8. Changes](#8-changes)
 - [Sponsors](#sponsors)
 
 ## 1. Installation
@@ -85,7 +86,18 @@ let { http, https } = acmeApp.listen(configs, (otps) => {
 
 ---
 
-## 3. Create widcard certificate
+## 3. Request a certificate
+
+On your browser,
+
+- To create, go to `http://domain.com/___acme/cert/create`
+- Or to renew go to `http://domain.com/___acme/cert/renew`
+
+Because `acme-express` has automatically complete the `http-01` acme challenge, you don't have to do anything else. It might take a few seconds to minutes to complete.
+
+---
+
+## 4. Request a widcard certificate
 
 On your browser,
 
@@ -100,7 +112,7 @@ But when either a `DNSClient` is not provided, or LetsEncrypt server take someti
 
 ---
 
-## 4. Enviroment variables
+## 5. Enviroment variables
 
 The library use some variables as following:
 
@@ -117,20 +129,32 @@ The library use some variables as following:
 ### `ACME_EXPRESS_EMAIL`: string
 
 - Default value: `sample@notrealdomain.com`
-- Email of maintainer. This email will be used to create a Letsencrypt account
+- Email of maintainer. This email will be used to create a LetsEncrypt account
+
+### `ACME_EXPRESS_AUTH_KEY`: string
+
+- Default value: `undefined`
+- Bearer key to for API authorization. If set, when using the APIs, use `Authorization: Bearer xxx` where xxx is the `ACME_EXPRESS_AUTH_KEY`. It's useful to protect your APIs from public access
+
+### `ACME_EXPRESS_ENABLE_EXPIRE_LIST`: `true` | `false` | undefined
+
+- Default value: `undefined`
+- Set to `true` to enable `/___acme/expire` APIs
 
 Below is an example of a enviroment variables file
 
 ```js
 // .env
 ACME_EXPRESS_EMAIL=your@email.com
-ACME_EXPRESS_PRODUCTION=false # to use stagging or "true" to use production LetEncrypt API
-ACME_EXPRESS_PATH=./acme-express/certs # where to store certs and database files
+ACME_EXPRESS_AUTH_KEY=randomkey_for_auth_bearer
+ACME_EXPRESS_PRODUCTION=false
+ACME_EXPRESS_PATH=./acme-express/certs
+ACME_EXPRESS_ENABLE_EXPIRE_LIST=false 
 ```
 
 ---
 
-## 5. APIs
+## 6. APIs
 
 For wildcard certificate:
 
@@ -142,9 +166,9 @@ For wildcard certificate:
 
 Others:
 
-- `/___acme/exire?date=yyyy-mm-dd`: Get a list of exired domain on or after `date`. If no `date` is given, `date` will be 30 days from now.
+- `/___acme/expire?date=yyyy-mm-dd`: Get a list of exired domain on or after `date`. If no `date` is given, `date` will be 30 days from now.
 
-## 6. Licenses
+## 7. Licenses
 
 This library itself hold a MIT license. Besides, beware that it contains other libraries that hold diferent licenses.
 
@@ -152,7 +176,7 @@ Dependencies and its licenses:
 
 - [acme-client](https://github.com/publishlab/node-acme-client): [MIT](https://github.com/publishlab/node-acme-client/blob/master/LICENSE)
 
-## 7. Changes
+## 8. Changes
 
 ### v1.0
 
@@ -166,15 +190,13 @@ Dependencies and its licenses:
 
 Feel free to [create an issue](https://github.com/hieunc229/acme-middleware/issues/new) to ask, give feedback and contribute
 
-## 8. Donate
-
-By using this library, you can save between $8-$900 per certificate a year, depending on the provider. If you are happy and want to donate, please either donate to [LetsEncrypt](https://letsencrypt.org/donate/) or any of charity that you want (preferably charity for helping children from underprivileged areas).
-
-Please let me know you donate by sending an email to hieunc(at)inverr.com!
-
 ##  Sponsors
 
 <a href="https://inverr.com" target="_blank">
 <img height="34" width="34" src="https://inverr.com/logo.svg" alt="Create a website with Inverr" />
 Inverr — Nocode Site Builder
 </a>
+
+By using this library, you can save between $8-$900 per certificate a year, depending on the provider. If you are happy and want to donate, please either donate to [LetsEncrypt](https://letsencrypt.org/donate/) or any of charity that you want (preferably charity for helping children from underprivileged areas).
+
+Please let me know you donate by sending an email to hieunc(at)inverr.com!
