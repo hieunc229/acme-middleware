@@ -6,5 +6,6 @@ node.md
 certs
 
 /src/modules/dns-client
+/dist
 
 *.bak
