@@ -39,12 +39,8 @@ $ yarn add acme-middleware
 $ npm install acme-middleware --save
 ```
 
-2. Configure enviroment `.env`
+2. Setup enviroment `.env` in your main project. See section [3. Enviroment variables](#3-enviroment-variables) for example and more details.
 
-Make sure you have the following variables in your `.env` from your main project.
-See section [3. Enviroment variables](#3-enviroment-variables) for example and more details.
-
----
 
 ## 2. How to use
 
@@ -88,7 +84,6 @@ let { http, https } = acmeApp.listen(configs, (otps) => {
 });
 ```
 
----
 
 ## 3. Request a certificate
 
@@ -99,7 +94,6 @@ On your browser,
 
 Because `acme-express` has automatically complete the `http-01` acme challenge, you don't have to do anything else. It might take a few seconds to minutes to complete.
 
----
 
 ## 4. Request a widcard certificate
 
@@ -114,7 +108,6 @@ If you have a `DNSClient` properly setup, wait a few minutes and everything is d
 
 But when either a `DNSClient` is not provided, or LetsEncrypt server take sometimes to verify your DNS changes. You'll need to wait to and try again to complete. See [Updating DNS and generate certificate for wildcard domain](/docs/update-dns.md) for more dtails.
 
----
 
 ## 5. Enviroment variables
 
@@ -122,28 +115,28 @@ The library use some variables as following:
 
 ### `ACME_EXPRESS_PATH`: string | undefined
 
-- Default value: `/acme-express/certs`
 - Where to store certificates, keysm and acme challenge files
+- Default value: `./acme-express/certs`
 
 ### `ACME_EXPRESS_PRODUCTION`: `true`| `false` | undefined
 
-- Default value: `undefined`
 - Production mode, if set to `true`, the library will request to production endpoint. Ortherwise, it will use staging endpoint
+- Default value: `undefined`
 
 ### `ACME_EXPRESS_EMAIL`: string
 
-- Default value: `sample@notrealdomain.com`
 - Email of maintainer. This email will be used to create a LetsEncrypt account
+- Default value: `sample@notrealdomain.com`
 
 ### `ACME_EXPRESS_AUTH_KEY`: string
 
-- Default value: `undefined`
 - Bearer key to for API authorization. If set, when using the APIs, use `Authorization: Bearer xxx` where xxx is the `ACME_EXPRESS_AUTH_KEY`. It's useful to protect your APIs from public access
+- Default value: `undefined`
 
 ### `ACME_EXPRESS_ENABLE_EXPIRE_LIST`: `true` | `false` | undefined
 
-- Default value: `undefined`
 - Set to `true` to enable `/___acme/expire` APIs
+- Default value: `undefined`
 
 Below is an example of a enviroment variables file
 
@@ -156,7 +149,6 @@ ACME_EXPRESS_PATH=./acme-express/certs
 ACME_EXPRESS_ENABLE_EXPIRE_LIST=false 
 ```
 
----
 
 ## 6. APIs
 
