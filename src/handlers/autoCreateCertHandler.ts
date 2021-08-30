@@ -11,7 +11,7 @@ export async function createCertAutoHandler(req: WildcardCreateRequest, res: Res
 
     const domain = req.query.domain as string || req.hostname;
 
-    if ("nocheck" in req.query === false) {
+    if (!req.skipChecking || req.query['check-exists'] === "false") {
         const exists = certificate.exists(domain, `key.pem`);
         if (exists) {
             return res.status(409).json({
