@@ -1,6 +1,6 @@
 # Updating DNS and generate certificate for wildcard domain
 
-_If you came to this page through error "No DNSClient was provided", which mean acme-middleware can't automatically create `txt` record to your domain. Do the following steps_
+_If you came to this page through error "No DNSClient was provided", that means acme-middleware can't automatically create `txt` record to your domain. Do the following steps_
 
 ### 1. Create a record
 
