@@ -16,9 +16,11 @@ import { infoCertWithWildcardHandler } from "./handlers/infoCertHandler";
 
 import { listExpiredDomainHandler } from "./handlers/listExpiredDomainHandler";
 import { startup } from "./functions/startup";
-import { createCertAutoHandler } from "./handlers/createCertAutoHandler";
+import { createCertAutoHandler } from "./handlers/autoCreateCertHandler";
 import { orderInfoHandler } from "./handlers/orderInfoHandler";
 import { log } from "./certificate/utils";
+import { authHandler } from "handlers/authHandler";
+import { renewCertAutoHandler } from "handlers/autoRenewCertHandler";
 
 export const ACME_PATH = "/___acme";
 
@@ -61,6 +63,14 @@ export class AcmeExpress {
             express.static(getAcmePath('acme-challenge'))
         );
 
+        this.app.use(ACME_PATH, authHandler)
+
+        // Create a certficate
+        this.app.get(`${ACME_PATH}/cert/create`, createCertAutoHandler);
+
+        // Renew an existing certificate
+        this.app.get(`${ACME_PATH}/cert/renew`, renewCertAutoHandler);
+
         // Create a new certificate
         this.app.get(`${ACME_PATH}/wildcard/create`, createCertWithWildcardHandler);
 
@@ -72,14 +82,11 @@ export class AcmeExpress {
         // Get existing info
         this.app.get(`${ACME_PATH}/wildcard/info`, infoCertWithWildcardHandler);
 
-        // Start validate and generate certificate
+        // Start validate and request certificate
         this.app.get(`${ACME_PATH}/wildcard/process`, processCertWithWildcardHandler);
 
-        // Start validate and generate certificate
+        // Get request order object
         this.app.get(`${ACME_PATH}/wildcard/order`, orderInfoHandler);
-
-        // Start validate and generate certificate
-        this.app.get(`${ACME_PATH}/cert/create`, createCertAutoHandler);
 
         if (process.env.ACME_EXPRESS_PRODUCTION !== "true" || process.env.ACME_EXPRESS_ENABLE_EXPIRE_LIST  === "true") {
             // Start validate and generate certificate
