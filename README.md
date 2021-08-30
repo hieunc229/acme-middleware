@@ -1,4 +1,8 @@
-# Free and Automated SSL certificate powered by Letsencrypt
+# ACME Middleware — Free and Automated SSL certificate for Expressjs, powered by LetsEncrypt
+
+<a href="https://www.npmjs.com/package/acme-middleware" target="_blank">
+<img src="https://img.shields.io/npm/v/acme-middleware" alt="acme-middleware on NPM" />
+</a>
 
 `acme-middleware` helps generate free SSL powered by Letsencrypt.
 It is used as a library that wrap around your `expressjs` application
@@ -9,10 +13,10 @@ It is used as a library that wrap around your `expressjs` application
 - [x] HTTP Validation (HTTP-01) (automatically)
 - [x] DNS Validation (DNS-01)
 - [x] Wildcard SSL (documentation to be complete)
-- [x] Domain management
+- [x] Manage data with sqlite
 - [x] Automatically renew using cron job
 
-### Table of contenst
+### Table of contents
 
 - [1. Installation](#1-installation)
 - [2. How to use](#2-how-to-use)
