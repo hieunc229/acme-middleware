@@ -1,5 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AcmeDNSClientAbstract = void 0;
+class AcmeDNSClientAbstract {
+}
+exports.AcmeDNSClientAbstract = AcmeDNSClientAbstract;
 let _client;
 const DNSClient = {
     get: () => {

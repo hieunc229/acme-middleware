@@ -1,7 +1,6 @@
 /// <reference types="node" />
 import https from "https";
 import express, { Express } from "express";
-import KnexCertStore from "./modules/cert-store";
 import AcmeDNSClientAbstract from "./modules/dns-client";
 export declare const ACME_PATH = "/___acme";
 export declare class AcmeExpress {
@@ -9,7 +8,7 @@ export declare class AcmeExpress {
     private https;
     constructor(props: {
         app: any;
-        store?: KnexCertStore;
+        dbPath?: string;
         dnsClient?: AcmeDNSClientAbstract;
     });
     private initiate;

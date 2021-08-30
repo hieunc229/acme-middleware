@@ -9,16 +9,17 @@ const store_1 = __importDefault(require("./store"));
 const pathUtils_1 = __importDefault(require("./pathUtils"));
 const https_1 = __importDefault(require("./https"));
 const DNSClient_1 = __importDefault(require("./store/DNSClient"));
+const cert_store_1 = __importDefault(require("./modules/cert-store"));
 const utils_1 = require("./utils");
 const createCertHandler_1 = require("./handlers/createCertHandler");
 const renewCertHandler_1 = require("./handlers/renewCertHandler");
 const processCertHandler_1 = require("./handlers/processCertHandler");
 const infoCertHandler_1 = require("./handlers/infoCertHandler");
-const verifyChallangeHandler_1 = require("./handlers/verifyChallangeHandler");
 const listExpiredDomainHandler_1 = require("./handlers/listExpiredDomainHandler");
 const startup_1 = require("./functions/startup");
 const createCertAutoHandler_1 = require("./handlers/createCertAutoHandler");
 const orderInfoHandler_1 = require("./handlers/orderInfoHandler");
+const utils_2 = require("./certificate/utils");
 exports.ACME_PATH = "/___acme";
 class AcmeExpress {
     constructor(props) {
@@ -36,28 +37,25 @@ class AcmeExpress {
             // Start validate and generate certificate
             this.app.get(`${exports.ACME_PATH}/wildcard/process`, processCertHandler_1.processCertWithWildcardHandler);
             // Start validate and generate certificate
-            this.app.get(`${exports.ACME_PATH}/wildcard/verify`, verifyChallangeHandler_1.verifyCertWithWildcardHandler);
+            this.app.get(`${exports.ACME_PATH}/wildcard/order`, orderInfoHandler_1.orderInfoHandler);
             // Start validate and generate certificate
             this.app.get(`${exports.ACME_PATH}/cert/create`, createCertAutoHandler_1.createCertAutoHandler);
-            // Start validate and generate certificate
-            this.app.get(`${exports.ACME_PATH}/order`, orderInfoHandler_1.orderInfoHandler);
-            if (process.env.ACME_EXPRESS_PRODUCTION !== "true") {
+            if (process.env.ACME_EXPRESS_PRODUCTION !== "true" || process.env.ACME_EXPRESS_ENABLE_EXPIRE_LIST === "true") {
                 // Start validate and generate certificate
                 this.app.get(`${exports.ACME_PATH}/expire`, listExpiredDomainHandler_1.listExpiredDomainHandler);
             }
         };
         this.app = props.app;
         this.https = https_1.default(props.app);
-        props.store && store_1.default.setStore(props.store);
+        const store = new cert_store_1.default(props.dbPath || pathUtils_1.default("acme.db"));
+        store_1.default.setStore(store);
         props.dnsClient && DNSClient_1.default.set(props.dnsClient);
-        // if (process.env.ACME_EXPRESS_PRODUCTION !== "true") {
-        console.log(`==== [ACME] 
-                production:${process.env.ACME_EXPRESS_PRODUCTION},
-                store:${!!props.store}, 
-                dnsClient:${!!props.dnsClient}, 
-                path:${process.env.ACME_EXPRESS_PATH}
-            `);
-        // }
+        utils_2.log(`==== [ACME] 
+            production:${process.env.ACME_EXPRESS_PRODUCTION},
+            dbPath:${!!props.dbPath}, 
+            dnsClient:${!!props.dnsClient}, 
+            path:${process.env.ACME_EXPRESS_PATH}
+        `);
         this.initiate();
         startup_1.startup();
     }

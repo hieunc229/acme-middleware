@@ -74,6 +74,12 @@ function createChallenge(props) {
             }
         };
         yield store.set("challenge", domain, output);
+        if (!dnsRecord) {
+            return Promise.reject(`No DNSClient was provided. 
+        Now, you need to create a TXT record name=${challenge.dnsChallengeRecord}, value=${keyAuthorization}. 
+        More details at https://github.com/hieunc229/acme-middleware/blob/origin/docs/update-dns.md
+        `);
+        }
         if (challenge && authz) {
             yield process_1.processChallengeRW({
                 challenge: challenge.dnsChallange,
