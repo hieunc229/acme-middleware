@@ -16,9 +16,9 @@ import { processCertWithWildcardHandler } from "./handlers/processCertHandler";
 
 import { log } from "./certificate/utils";
 import { startup } from "./functions/startup";
-import { authHandler } from "handlers/authHandler";
+import { authHandler } from "./handlers/authHandler";
 import { orderInfoHandler } from "./handlers/orderInfoHandler";
-import { renewCertAutoHandler } from "handlers/autoRenewCertHandler";
+import { renewCertAutoHandler } from "./handlers/autoRenewCertHandler";
 import { createCertAutoHandler } from "./handlers/autoCreateCertHandler";
 import { listExpiredDomainHandler } from "./handlers/listExpiredDomainHandler";
 
