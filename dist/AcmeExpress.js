@@ -17,15 +17,22 @@ const processCertHandler_1 = require("./handlers/processCertHandler");
 const infoCertHandler_1 = require("./handlers/infoCertHandler");
 const listExpiredDomainHandler_1 = require("./handlers/listExpiredDomainHandler");
 const startup_1 = require("./functions/startup");
-const createCertAutoHandler_1 = require("./handlers/createCertAutoHandler");
+const autoCreateCertHandler_1 = require("./handlers/autoCreateCertHandler");
 const orderInfoHandler_1 = require("./handlers/orderInfoHandler");
 const utils_2 = require("./certificate/utils");
+const authHandler_1 = require("handlers/authHandler");
+const autoRenewCertHandler_1 = require("handlers/autoRenewCertHandler");
 exports.ACME_PATH = "/___acme";
 class AcmeExpress {
     constructor(props) {
         this.initiate = () => {
             utils_1.dirCheckup();
             this.app.use('/.well-known/acme-challenge', express_1.default.static(pathUtils_1.default('acme-challenge')));
+            this.app.use(exports.ACME_PATH, authHandler_1.authHandler);
+            // Create a certficate
+            this.app.get(`${exports.ACME_PATH}/cert/create`, autoCreateCertHandler_1.createCertAutoHandler);
+            // Renew an existing certificate
+            this.app.get(`${exports.ACME_PATH}/cert/renew`, autoRenewCertHandler_1.renewCertAutoHandler);
             // Create a new certificate
             this.app.get(`${exports.ACME_PATH}/wildcard/create`, createCertHandler_1.createCertWithWildcardHandler);
             // Renew an existing certificate
@@ -34,12 +41,10 @@ class AcmeExpress {
             this.app.get(`${exports.ACME_PATH}/wildcard/renew`, renewCertHandler_1.renewCertWithWildcardHandler);
             // Get existing info
             this.app.get(`${exports.ACME_PATH}/wildcard/info`, infoCertHandler_1.infoCertWithWildcardHandler);
-            // Start validate and generate certificate
+            // Start validate and request certificate
             this.app.get(`${exports.ACME_PATH}/wildcard/process`, processCertHandler_1.processCertWithWildcardHandler);
-            // Start validate and generate certificate
+            // Get request order object
             this.app.get(`${exports.ACME_PATH}/wildcard/order`, orderInfoHandler_1.orderInfoHandler);
-            // Start validate and generate certificate
-            this.app.get(`${exports.ACME_PATH}/cert/create`, createCertAutoHandler_1.createCertAutoHandler);
             if (process.env.ACME_EXPRESS_PRODUCTION !== "true" || process.env.ACME_EXPRESS_ENABLE_EXPIRE_LIST === "true") {
                 // Start validate and generate certificate
                 this.app.get(`${exports.ACME_PATH}/expire`, listExpiredDomainHandler_1.listExpiredDomainHandler);

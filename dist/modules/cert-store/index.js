@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const utils_1 = require("../../certificate/utils");
 const knex_1 = require("knex");
 class KnexCertStore {
     constructor(props, onReady) {
@@ -17,7 +18,7 @@ class KnexCertStore {
         };
         this.initate = () => {
             // TODO: migrate if schema changed
-            console.log("[ACME_EXPRESS_STORE] initiate...");
+            utils_1.log("[ACME_EXPRESS_STORE] initiate...");
             this.db.schema.hasTable("domains")
                 .then(exists => {
                 if (!exists) {
@@ -28,7 +29,7 @@ class KnexCertStore {
                 }
             })
                 .catch(err => {
-                console.log("[ACME_EXPRESS_STORE] initiate failed.", err);
+                utils_1.log("[ACME_EXPRESS_STORE] initiate failed.", err);
             });
         };
         this.setupTables = (cb) => {
@@ -48,10 +49,10 @@ class KnexCertStore {
             }))
                 .then(rs => {
                 cb && cb();
-                console.log("[ACME_EXPRESS_STORE] setup completed");
+                utils_1.log("[ACME_EXPRESS_STORE] setup completed");
             })
                 .catch(err => {
-                console.log("[ACME_EXPRESS_STORE] setup failed.", err);
+                utils_1.log("[ACME_EXPRESS_STORE] setup failed.", err);
             });
         };
         this.get = (table, key, options) => {
@@ -123,7 +124,7 @@ class KnexCertStore {
                 useNullAsDefault: true
             } : props;
         this.db = knex_1.knex(options);
-        console.log("[CERTSTORE]", props);
+        utils_1.log("[CERTSTORE]", props);
         this.initate();
     }
     /**
