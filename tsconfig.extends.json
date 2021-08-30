@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "isolatedModules": false,
+    "baseUrl": "./src",
+    "paths": {
+      "@dns-client": ["modules/acme-dns-client"],
+      "@dns-client/*": ["modules/acme-dns-client/*"],
+    }
+  }
+}
