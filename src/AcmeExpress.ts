@@ -4,23 +4,23 @@ import express, { Express } from "express";
 import CertStore from "./store";
 import getAcmePath from "./pathUtils";
 import createSSLServer from "./https";
-import DNSClient from "./store/DNSClient";
 import KnexCertStore from "./modules/cert-store";
-import AcmeDNSClientAbstract from "./modules/dns-client";
+
+import DNSClient, { AcmeDNSClientAbstract } from "./store/DNSClient";
 
 import { dirCheckup } from "./utils";
-import { createCertWithWildcardHandler } from "./handlers/createCertHandler";
-import { renewCertWithWildcardHandler } from "./handlers/renewCertHandler";
-import { processCertWithWildcardHandler } from "./handlers/processCertHandler";
 import { infoCertWithWildcardHandler } from "./handlers/infoCertHandler";
+import { renewCertWithWildcardHandler } from "./handlers/renewCertHandler";
+import { createCertWithWildcardHandler } from "./handlers/createCertHandler";
+import { processCertWithWildcardHandler } from "./handlers/processCertHandler";
 
-import { listExpiredDomainHandler } from "./handlers/listExpiredDomainHandler";
-import { startup } from "./functions/startup";
-import { createCertAutoHandler } from "./handlers/autoCreateCertHandler";
-import { orderInfoHandler } from "./handlers/orderInfoHandler";
 import { log } from "./certificate/utils";
+import { startup } from "./functions/startup";
 import { authHandler } from "handlers/authHandler";
+import { orderInfoHandler } from "./handlers/orderInfoHandler";
 import { renewCertAutoHandler } from "handlers/autoRenewCertHandler";
+import { createCertAutoHandler } from "./handlers/autoCreateCertHandler";
+import { listExpiredDomainHandler } from "./handlers/listExpiredDomainHandler";
 
 export const ACME_PATH = "/___acme";
 
