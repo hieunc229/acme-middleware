@@ -1,3 +1,4 @@
+import { log } from "../../certificate/utils";
 import { Knex, knex } from "knex";
 
 type CertificateStoreItem = any;
@@ -22,7 +23,7 @@ export default class KnexCertStore {
 
         this.db = knex(options);
 
-        console.log("[CERTSTORE]", props);
+        log("[CERTSTORE]", props);
 
         this.initate();
     }
@@ -34,7 +35,7 @@ export default class KnexCertStore {
     private initate = () => {
 
         // TODO: migrate if schema changed
-        console.log("[ACME_EXPRESS_STORE] initiate...")
+        log("[ACME_EXPRESS_STORE] initiate...")
         this.db.schema.hasTable("domains")
             .then(exists => {
                 if (!exists) {
@@ -44,7 +45,7 @@ export default class KnexCertStore {
                 }
             })
             .catch(err => {
-                console.log("[ACME_EXPRESS_STORE] initiate failed.", err)
+                log("[ACME_EXPRESS_STORE] initiate failed.", err)
             })
     }
 
@@ -70,10 +71,10 @@ export default class KnexCertStore {
             .then(rs => {
 
                 cb && cb()
-                console.log("[ACME_EXPRESS_STORE] setup completed")
+                log("[ACME_EXPRESS_STORE] setup completed")
             })
             .catch(err => {
-                console.log("[ACME_EXPRESS_STORE] setup failed.", err)
+                log("[ACME_EXPRESS_STORE] setup failed.", err)
             })
 
     }
