@@ -1,7 +1,7 @@
 import certificate from "../certificate/certificate";
 
 import { Request, Response } from "express";
-import { createCertWithWildcardHandler, WildcardCreateRequest } from "./createCertHandler";
+import { createCertWithWildcardHandler, WildcardCreateRequest } from "./wildcardCreateCertHandler";
 import CertStore from "../store";
 
 

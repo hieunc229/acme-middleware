@@ -9,15 +9,15 @@ import KnexCertStore from "./modules/cert-store";
 import DNSClient, { AcmeDNSClientAbstract } from "./store/DNSClient";
 
 import { dirCheckup } from "./utils";
-import { infoCertWithWildcardHandler } from "./handlers/infoCertHandler";
-import { renewCertWithWildcardHandler } from "./handlers/renewCertHandler";
-import { createCertWithWildcardHandler } from "./handlers/createCertHandler";
-import { processCertWithWildcardHandler } from "./handlers/processCertHandler";
+import { infoCertWithWildcardHandler } from "./handlers/wildcardRequestInfoCertHandler";
+import { renewCertWithWildcardHandler } from "./handlers/wildcardRenewCertHandler";
+import { createCertWithWildcardHandler } from "./handlers/wildcardCreateCertHandler";
+import { processCertWithWildcardHandler } from "./handlers/wildcardProcessCertHandler";
 
 import { log } from "./certificate/utils";
 import { startup } from "./functions/startup";
 import { authHandler } from "./handlers/authHandler";
-import { orderInfoHandler } from "./handlers/orderInfoHandler";
+import { orderInfoHandler } from "./handlers/wildcardOrderInfoHandler";
 import { renewCertAutoHandler } from "./handlers/autoRenewCertHandler";
 import { createCertAutoHandler } from "./handlers/autoCreateCertHandler";
 import { listExpiredDomainHandler } from "./handlers/listExpiredDomainHandler";

@@ -6,7 +6,11 @@ export async function processCertWithWildcardHandler(req: Request, res: Response
 
     let domain = req.query.domain as string || req.hostname;
 
-    processChallenge({ domain, altNames: [`*.${domain}`] })
+    processChallenge({ 
+        domain, 
+        altNames: [`*.${domain}`],
+        skipDNSCheck: req.query['skip-dns'] === "true"
+    })
         .then(data => {
             res.status(200).json({
                 status: 'ok',

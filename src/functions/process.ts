@@ -12,7 +12,12 @@ import { verifyDNS } from "./verify";
 import { createDNS } from "./createDNS";
 
 
-type Props = { domain: string, altNames?: string[], email?: string, challengeOnly?: boolean };
+type Props = { 
+    domain: string, 
+    altNames?: string[], 
+    email?: string, 
+    skipDNSCheck?: boolean 
+};
 
 export default async function processChallenge(opts: Props) {
 
@@ -40,7 +45,8 @@ export default async function processChallenge(opts: Props) {
         challenge,
         domain,
         altNames,
-        auth: authz
+        auth: authz,
+        skipDNSCheck: opts.skipDNSCheck
     })
 }
 
@@ -52,13 +58,14 @@ type ProcessChallengeProps = {
     domain: string,
     altNames?: string[],
     auth: acme.Authorization,
+    skipDNSCheck?: boolean
 }
 
 export async function processChallengeRW(opts: ProcessChallengeProps) {
 
-    if (["valid", "ready"].indexOf(opts.order.status) === -1) {
-        return Promise.reject(`Order status must be ready/valid. Current status ${opts.order.status}`)
-    }
+    // if (["valid", "ready"].indexOf(opts.order.status) === -1) {
+    //     return Promise.reject(`Order status must be ready/valid. Current status ${opts.order.status}`)
+    // }
 
     const { domain, altNames } = opts;
 
@@ -68,12 +75,15 @@ export async function processChallengeRW(opts: ProcessChallengeProps) {
     const order = opts.order;
 
     const challenge = opts.challenge;
-    const dnsValid = await verifyDNS(item);
-
     let dnsRecord = item.dnsRecord;
 
-    if (!dnsValid.valid) {
-        dnsRecord = await createDNS(item.challenge, item.challenge.keyAuthorization);
+    if (opts.skipDNSCheck === true) {
+        const dnsValid = await verifyDNS(item);
+
+
+        if (!dnsValid.valid) {
+            dnsRecord = await createDNS(item.challenge, item.challenge.keyAuthorization);
+        }
     }
 
     const verify = await client.verifyChallenge(opts.auth, challenge);

@@ -1,5 +1,7 @@
-import { AcmeExpress } from "./AcmeExpress";
 import CertStore from "./store";
-export { createCertWithWildcardHandler } from "./handlers/createCertHandler";
+
 export { CertStore };
+import { AcmeExpress } from "./AcmeExpress";
+export { createCertWithWildcardHandler } from "./handlers/wildcardCreateCertHandler";
+
 export default AcmeExpress;
