@@ -130,7 +130,7 @@ export async function processChallengeRW(opts: ProcessChallengeProps) {
     const dnsClient = DNSClient.get();
 
     if (dnsClient && dnsRecord) {
-        await dnsClient.removeRecord(dnsRecord.id)
+        await dnsClient.removeRecord({ domain, dnsRecord })
     }
 
     await store.remove("challenge", domain);

@@ -6,7 +6,13 @@ export async function createDNS(challenge: CertChallangeItem, keyAuthorization: 
     const dnsClient = DNSClient.get();
 
     if (dnsClient) {
-        let request = await dnsClient.createRecord(challenge.dnsChallengeRecord, "TXT", keyAuthorization);
+        let request = await dnsClient.createRecord({
+            name: challenge.dnsChallengeRecord, 
+            type: "TXT", 
+            value: keyAuthorization,
+            domain: challenge.identifier.value,
+            challenge: challenge
+        });
         dnsRecord = request.result;
     }
     return dnsRecord;
