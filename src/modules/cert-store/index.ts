@@ -141,9 +141,10 @@ export default class KnexCertStore {
                 .catch(async err => {
                     if (err.toString().indexOf("SQLITE_CONSTRAINT: UNIQUE") !== -1) {
                         await this.remove(table, key);
-                        this.set(table, key, data)
+                        await this.set(table, key, data)
                             .then(handleResolver)
                             .catch(reject)
+                        return;
                     }
                     reject(err)
                 })
