@@ -21,6 +21,7 @@ import { orderInfoHandler } from "./handlers/wildcardOrderInfoHandler";
 import { renewCertAutoHandler } from "./handlers/autoRenewCertHandler";
 import { createCertAutoHandler } from "./handlers/autoCreateCertHandler";
 import { listExpiredDomainHandler } from "./handlers/listExpiredDomainHandler";
+import { ValidateDomainFn } from "./certificate/loadCert";
 
 export const ACME_PATH = "/___acme";
 
@@ -32,11 +33,12 @@ export class AcmeExpress {
     constructor(props: {
         app: any,
         dbPath?: string,
-        dnsClient?: AcmeDNSClientAbstract
+        dnsClient?: AcmeDNSClientAbstract,
+        validateDomain?: ValidateDomainFn
     }) {
 
         this.app = props.app;
-        this.https = createSSLServer(props.app);
+        this.https = createSSLServer(props.app, { validateDomain: props.validateDomain });
 
         const store = new KnexCertStore(props.dbPath || getAcmePath("acme.db"));
         CertStore.setStore(store);

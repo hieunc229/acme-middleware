@@ -2,14 +2,16 @@ import https from 'https';
 import tls from "tls";
 import getAcmePath from './pathUtils';
 
-import { loadCert } from './certificate/loadCert';
+import { loadCert, ValidateDomainFn } from './certificate/loadCert';
 import { checkDefaultCert } from './certificate/defaultCert';
 
 const localCertPath = getAcmePath("default/cert.pem")
 const localKeyPath = getAcmePath("default/key.pem");
 
 
-export default function createSSLServer(app: any) {
+export default function createSSLServer(app: any, options: {
+    validateDomain?: ValidateDomainFn
+}) {
 
     checkDefaultCert(localCertPath, localKeyPath);
 
@@ -21,13 +23,12 @@ export default function createSSLServer(app: any) {
                 return;
             }
 
-            loadCert(servername)
+            loadCert(servername, options)
                 .then(ctx => {
                     cb(null, ctx)
                 })
                 .catch(err => {
-                    console.log("[err SNICallback]", servername)
-                    localCertCB(cb);
+                    return cb(err)
                 })
         },
         sessionTimeout: 15000

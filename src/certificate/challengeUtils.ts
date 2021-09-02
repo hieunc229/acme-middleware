@@ -7,6 +7,9 @@ export function createChallenge(clientToken: string, accountToken: string) {
 
 export function removeChallenge(clientToken: string) {
 
-    fs.unlinkSync(getAcmePath(`acme-challenge`, clientToken));
-
+    try {
+        fs.unlinkSync(getAcmePath(`acme-challenge`, clientToken));
+    } catch (err) {
+        console.log("Unable to remove challange", err.toString());
+    }
 }

@@ -13,10 +13,9 @@ export async function renewCertAutoHandler(req: WildcardCreateRequest, res: Resp
 
     const exists = certificate.exists(domain, `key.pem`);
     if (exists) {
-        return res.status(409).json({
-            status: 'failed',
-            message: "Certificate already exists"
-        })
+        if (req.query.confirm === "true") {
+            await certificate.remove(domain);
+        }
     }
 
     req.skipChecking = true;
