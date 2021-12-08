@@ -10,7 +10,7 @@ import { createChallenge, removeChallenge } from "./challengeUtils";
  * @returns {Promise}
  */
 export async function challengeCreateFn(challenge: Challenge, keyAuthorization: string) {
-    return createChallenge(challenge.token, keyAuthorization);
+  return createChallenge(challenge.token, keyAuthorization);
 }
 
 
@@ -23,19 +23,22 @@ export async function challengeCreateFn(challenge: Challenge, keyAuthorization: 
  */
 
 export async function challengeRemoveFn(challenge: Challenge) {
-    /* Do something here */
-    // log(JSON.stringify(authz));
-    // log(JSON.stringify(challenge));
-    // log(keyAuthorization);
+  /* Do something here */
+  // log(JSON.stringify(authz));
+  // log(JSON.stringify(challenge));
+  // log(keyAuthorization);
 
-    // console.log("remove", challenge.token);
-    return removeChallenge(challenge.token);
+  // console.log("remove", challenge.token);
+  return removeChallenge(challenge.token);
 }
 
 
 export function log(...args: any[]) {
-    if (process.env.ACME_EXPRESS_PRODUCTION !== "true") {
-        console.log(...args);
+  if (process.env.ACME_EXPRESS_PRODUCTION !== "true" || process.env.ACME_EXPRESS_DEBUG === "true") {
+    try {
+      console.log(`[${new Date().toJSON()}]`, ...args);
+    } catch (err) {
+      console.log(`[${new Date().toJSON()}]`, "failed to print");
     }
-    // console.log(arguments)}
+  }
 }

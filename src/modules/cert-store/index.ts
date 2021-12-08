@@ -182,10 +182,10 @@ export default class KnexCertStore {
 
 const defaultOptions = {
     domains: {
-        jsonProperties: ["dnsRecord", "altNames"]
+        jsonProperties: ["altNames"]
     },
     challenge: {
-        jsonProperties: ["dnsRecord", "challenge", "order"]
+        jsonProperties: ["challenge", "order"]
     }
 }
 
@@ -195,7 +195,11 @@ function restoreJSONProperties(data: any, properties?: string[]) {
 
     properties && properties.forEach(k => {
         if (k in item) {
+          try {
             item[k] = JSON.parse(item[k])
+          } catch (err) {
+            console.log("Unable to parse " + k)
+          }
         }
     })
 

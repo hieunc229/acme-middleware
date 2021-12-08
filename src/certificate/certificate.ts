@@ -1,5 +1,6 @@
 import fs from "fs";
 import getAcmePath from "../pathUtils";
+import { log } from "./utils";
 
 function remove(domain: string) {
     fs.unlinkSync(getAcmePath(domain, `key.pem`))
@@ -10,7 +11,7 @@ function save(domain: string, fileName: string, content: Buffer | string) {
 
     const dir = getAcmePath(domain);
 
-    console.log("[save]", dir)
+    log("[save]", dir)
 
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);

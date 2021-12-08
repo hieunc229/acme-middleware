@@ -34,6 +34,7 @@ function renewList(items: CertificateStoreItem[]) {
             item = items[i];
 
             domain = item.id;
+            
             altNames = item.altNames;
 
             renewDomain({ domain, altNames })

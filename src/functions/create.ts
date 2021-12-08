@@ -6,138 +6,129 @@ import { getClient } from "../certificate/client";
 import { processChallengeRW } from "./process";
 import { getAuthIdentifiers } from "./utils";
 import { createDNS } from "./createDNS";
+import { log } from "../certificate/utils";
+
+import goPromise from "go-promise";
+import certificate from "../certificate/certificate";
 
 export type CertChallange = {
-    order: {
-        url: string,
-        identifiers: {
-            type: string;
-            value: string;
-        }[],
-        finalize: string,
-        authorizations: string[],
-        status: "pending" | "ready" | "processing" | "valid" | "invalid",
-    },
-    challenge: CertChallangeItem,
-    dnsRecord?: any
+  order: {
+    url: string,
+    identifiers: {
+      type: string;
+      value: string;
+    }[],
+    finalize: string,
+    authorizations: string[],
+    status: "pending" | "ready" | "processing" | "valid" | "invalid",
+  },
+  challenge: CertChallangeItem,
+  dnsRecord?: any
 }
 
 export type CertChallangeItem = {
-    url: string,
-    expires?: string,
-    wildcard?: boolean,
-    identifier: {
-        type: string;
-        value: string;
-    },
-    status: "pending" | "valid" | "invalid" | "deactivated" | "expired" | "revoked",
-    dnsChallengeRecord: string,
-    dnsChallange: Challenge,
-    keyAuthorization: string,
-    challenges: Challenge[]
+  url: string,
+  expires?: string,
+  wildcard?: boolean,
+  identifier: {
+    type: string;
+    value: string;
+  },
+  status: "pending" | "valid" | "invalid" | "deactivated" | "expired" | "revoked",
+  dnsChallengeRecord: string,
+  dnsChallange: Challenge,
+  keyAuthorization: string,
+  challenges: Challenge[]
 }
 
 export type CreateChallengeProps = {
-    email?: string,
-    domain: string,
-    altNames?: string[]
+  email?: string,
+  domain: string,
+  altNames?: string[],
+  skipCreateDNS?: boolean,
+  skipValidateChallange?: boolean,
+  revokeExistingCert?: boolean,
 }
 
 export async function createChallenge(props: CreateChallengeProps) {
 
-    let { domain, altNames } = props;
-    let email = props.email || process.env.ACME_EXPRESS_EMAIL || "sample@notrealdomain.com";
+  let { domain, altNames } = props;
+  let email = props.email || process.env.ACME_EXPRESS_EMAIL || "sample@notrealdomain.com";
 
-    const client = await getClient(email);
+  log("03. Create challange", { domain, altNames })
 
-    let identifiers = getAuthIdentifiers(domain, altNames);
+  const [clientError, client] = await goPromise(getClient(email));
 
-    /* Place new order */
-    const order = await client.createOrder({ identifiers });
-    const authorizations = await client.getAuthorizations(order);
+  if (clientError !== null || client === undefined) {
+    return Promise.reject(clientError || "Unable to get client")
+  }
 
-    let challenge: CertChallangeItem | undefined;
-    let authz: acme.Authorization | undefined;
-    let allValid = true;
+  if (props.revokeExistingCert) {
+    let cert = certificate.load(domain, "cert.pem");
+    let [revokeError] = await goPromise(client.revokeCertificate(cert));
 
-    authorizations.some(auth => {
-
-        if (auth.status !== "valid") {
-            allValid = false;
-        }
-
-        if (auth.status === "pending") {
-
-            let dnsChallange = auth.challenges.find(item => item.type === "dns-01")
-
-            if (dnsChallange) {
-                authz = auth;
-                challenge = {
-                    url: auth.url,
-                    expires: auth.expires,
-                    wildcard: auth.wildcard,
-                    identifier: auth.identifier,
-                    status: auth.status,
-                    dnsChallange: dnsChallange,
-                    dnsChallengeRecord: `_acme-challenge.${auth.identifier.value}`,
-                    challenges: auth.challenges,
-                    keyAuthorization: ""
-                }
-            }
-        }
-
-        return challenge;
-    })
-
-    if (!challenge) {
-        
-        if (allValid) {
-            return Promise.reject(`${domain} has already requested a certificate`)
-        }
-
-        return Promise.reject("Unable to find dns-01 challange")
+    if (revokeError) {
+      return Promise.reject(revokeError);
     }
+  }
 
-    const keyAuthorization = await client.getChallengeKeyAuthorization(challenge.dnsChallange);
-    const dnsRecord = await createDNS(challenge, keyAuthorization);
-   
-    let store = CertStore.getStore();
-    let output: CertChallange = {
-        dnsRecord,
-        challenge: {
-            ...challenge,
-            keyAuthorization
-        },
-        order: {
-            url: order.url,
-            identifiers: order.identifiers,
-            finalize: order.finalize,
-            authorizations: order.authorizations,
-            status: order.status
-        }
+  let identifiers = getAuthIdentifiers(domain, altNames);
+
+  /* Place new order */
+  const [orderError, order] = await goPromise(client.createOrder({ identifiers }));
+
+  if (orderError !== null || order === undefined) {
+    return Promise.reject(orderError || "Unable to get order")
+  }
+
+  const [authError, authorizations] = await goPromise(client.getAuthorizations(order));
+
+  if (authError !== null || authorizations === undefined) {
+    return Promise.reject(authError || "Unable to get authorizations")
+  }
+
+  log("04. Validate authz");
+
+  let dnsRecord = "unset";
+
+  let store = CertStore.getStore();
+  let output: CertChallange = {
+    dnsRecord,
+    challenge: {} as any,
+    order: {
+      url: order.url,
+      identifiers: order.identifiers,
+      finalize: order.finalize,
+      authorizations: order.authorizations,
+      status: order.status
     }
+  }
 
-    await store.set("challenge", domain, output);
+  let [setStoreError] = await goPromise(store.set("challenge", domain, output));
+  log("08. Save DNS challenge to store");
 
-    if (!dnsRecord) {
-        return Promise.reject(`No DNSClient was provided. 
-        Now, you need to create a TXT record name=${challenge.dnsChallengeRecord}, value=${keyAuthorization}. 
+  if (setStoreError !== null) {
+    return Promise.reject(setStoreError)
+  }
+
+  if (!dnsRecord) {
+    return Promise.reject(`No DNSClient was provided. 
         More details at https://github.com/hieunc229/acme-middleware/blob/origin/docs/update-dns.md
         `)
-    }
-
-    if (challenge && authz) {
-        await processChallengeRW({
-            challenge: challenge.dnsChallange,
-            altNames,
-            domain,
-            client,
-            order,
-            auth: authz
-        })
-    }
+  }
 
 
-    return output;
+  log("09. processChallengeRW")
 
+  let [processError] = await goPromise(processChallengeRW({
+    altNames,
+    domain,
+    client,
+    order,
+    auths: authorizations
+  }));
+
+  if (processError !== null) {
+    return Promise.reject(processError || "Unable to process/create certficate")
+  }
 }

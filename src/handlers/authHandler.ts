@@ -10,7 +10,6 @@ export async function authHandler(req: Request, res: Response, next: NextFunctio
                 message: "unauthorized access"
             })
         }
-
     }
 
     next()

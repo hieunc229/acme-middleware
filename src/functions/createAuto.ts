@@ -5,46 +5,72 @@ import certificate from "../certificate/certificate";
 
 import { getClient } from "../certificate/client";
 import { getFutureDate } from "../store/utils";
-import { challengeCreateFn, challengeRemoveFn } from "../certificate/utils";
+import { challengeCreateFn, challengeRemoveFn, log } from "../certificate/utils";
 import { Authorization, Challenge } from "acme-client/types/rfc8555";
 import { CreateChallengeProps } from "./create";
+import goPromise from "go-promise";
 
 export async function createCertAuto(props: CreateChallengeProps) {
 
-    let { domain } = props;
-    let email = props.email || process.env.ACME_EXPRESS_EMAIL || "sample@notrealdomain.com";
+  let { domain } = props;
+  let email = props.email || process.env.ACME_EXPRESS_EMAIL || "sample@notrealdomain.com";
 
-    const client = await getClient(email);
-    const [key, csr] = await acme.forge.createCsr({ commonName: domain });
+  log(domain + "01. Create cert auto", domain);
 
-    /* Certificate */
-    const cert = await client.auto({
-        csr,
-        email: email,
-        termsOfServiceAgreed: true,
-        challengeCreateFn: createChallange,
-        challengeRemoveFn: removeChallange
-    });
+  const [clientError, client] = await goPromise(getClient(email));
 
+  log(domain + " getClient:", !!client);
+  if (!client || clientError !== null) {
+    return Promise.reject(clientError)
+  }
 
-    await certificate.save(domain, `key.pem`, key);
-    await certificate.save(domain, `cert.pem`, cert);
+  const [createCSRError, CSRResult] = await goPromise(acme.forge.createCsr({ commonName: domain }));
 
-    const store = CertStore.getStore();
-    await store.set("domains", domain, { 
-        expire: getFutureDate(90).toJSON()
-    });
+  log(domain + " createCSR:", CSRResult);
+  if (!CSRResult || createCSRError !== null) {
+    return Promise.reject(createCSRError)
+  }
 
-    return [key.toString(), cert]
+  const [key, csr] = CSRResult;
+
+  /* Certificate */
+  const [createCertError, cert] = await goPromise(client.auto({
+    csr,
+    email: email,
+    termsOfServiceAgreed: true,
+    challengeCreateFn: createChallange,
+    challengeRemoveFn: removeChallange
+  }));
+
+  log(domain + " createCert:", cert);
+
+  if (!cert || createCertError) {
+    return Promise.reject(createCertError)
+  }
+
+  await certificate.save(domain, `key.pem`, key);
+  await certificate.save(domain, `cert.pem`, cert);
+
+  const store = CertStore.getStore();
+
+  const [setDomainError] = await goPromise(store.set("domains", domain, {
+    expire: getFutureDate(90).toJSON()
+  }));
+
+  if (!setDomainError !== null) {
+    return Promise.reject(setDomainError)
+  }
+
+  return [key.toString(), cert]
 }
 
 
 /// https://github.com/publishlab/node-acme-client/blob/master/examples/auto.js
 
 async function createChallange(authz: Authorization, challenge: Challenge, keyAuthorization: string) {
-    challengeCreateFn(challenge, keyAuthorization)
+  challengeCreateFn(challenge, keyAuthorization)
 }
 
 async function removeChallange(authz: Authorization, challenge: Challenge, keyAuthorization: string) {
-    challengeRemoveFn(challenge)
+  challengeRemoveFn(challenge)
 }

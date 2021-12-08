@@ -1,27 +1,33 @@
-import { CertChallangeItem } from "../functions/create";
+import { Challenge } from "acme-client/types/rfc8555";
+
+export type AcmeDNSClientType = "http-01" | "dns-01";
 
 export abstract class AcmeDNSClientAbstract {
-    abstract createRecord<T = any>(options: {
-        name: string,
-        type: string,
-        value: string,
-        domain: string,
-        challenge: CertChallangeItem
-    }): Promise<T>
-    abstract removeRecord<T = any>(data: any): Promise<T>
+  abstract createRecord<T = any>(options: {
+    name: string,
+    type: string,
+    value: string,
+    domain: string,
+    token: string,
+    challenge: Challenge
+  }): Promise<T>
+  abstract removeRecord<T = any>(data: any): Promise<T>
 }
 
-let _client: AcmeDNSClientAbstract | undefined;
+class _dnsClients {
+  private _client: { [type in AcmeDNSClientType]?: AcmeDNSClientAbstract } = {};
 
-const DNSClient = {
+  get(type: AcmeDNSClientType){
+    console.log("get", type);
+    return this._client[type];
+  }
 
-    get: () => {
-        return _client;
-    },
-
-    set: (client: AcmeDNSClientAbstract) => {
-        _client = client;
-    }
+  set(type: AcmeDNSClientType, client: AcmeDNSClientAbstract)  {
+    console.log("set", type);
+    this._client[type] = client;
+  }
 }
+
+const DNSClient = new _dnsClients();
 
 export default DNSClient;
