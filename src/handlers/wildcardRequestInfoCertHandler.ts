@@ -11,26 +11,25 @@ import { verifyDNS } from "../functions/verify";
  */
 export async function infoCertWithWildcardHandler(req: Request, res: Response) {
 
-    const domain = req.query.domain as string || req.hostname;
+  const domain = req.query.domain as string || req.hostname;
 
-    infoChallange({ domain })
-        .then(async data => {
+  infoChallange({ domain })
+    .then(async data => {
+      const verifyStatus = await verifyDNS(data);
 
-            const verifyStatus = await verifyDNS(data);
-
-            res.status(200).json({
-                status: 'ok',
-                data,
-                verifyStatus
-            })
-        })
-        .catch(err => {
-            res.status(500).json({
-                status: 'error',
-                domain,
-                message: err.toString()
-            })
-        })
+      res.status(200).json({
+        status: 'ok',
+        data,
+        verifyStatus
+      })
+    })
+    .catch(err => {
+      res.status(500).json({
+        status: 'error',
+        domain,
+        message: err.toString()
+      })
+    })
 
 
 }

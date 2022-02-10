@@ -27,9 +27,10 @@ export async function createCertAutoHandler(req: WildcardCreateRequest, res: Res
                 status: 'ok'
             })
         }).catch(err => {
+          console.log(err);
             res.status(500).json({
                 status: 'error',
-                message: err.toString()
+                message: err ? err.toString() : ""
             })
         });
 

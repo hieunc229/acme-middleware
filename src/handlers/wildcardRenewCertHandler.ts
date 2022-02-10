@@ -23,9 +23,9 @@ async function handler(req: WildcardCreateRequest, res: Response) {
       await store.remove("challenge", domain);
     }
 
-    if (req.query.confirm === "true") {
-      await certificate.remove(domain);
-    }
+    // if (req.query.clean === "true") {
+    //   await certificate.remove(domain);
+    // }
   }
 
   req.skipChecking = true;
