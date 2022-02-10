@@ -6,8 +6,7 @@ import DNSClient from "../store/DNSClient";
 import { getClient } from "../certificate/client";
 import { CertChallange } from "./create";
 import { getFutureDate } from "../store/utils";
-import { Challenge } from "acme-client/types/rfc8555";
-import { log } from "../certificate/utils";
+import { handleReject, log } from "../certificate/utils";
 import { createDNS } from "./createDNS";
 import goPromise from "go-promise";
 
@@ -32,7 +31,7 @@ export default async function processChallenge(opts: Props) {
   const auths = await client.getAuthorizations(order);
 
   if (auths.length === 0) {
-    return Promise.reject(`Unable to get authorization`)
+    return handleReject(`Unable to get authorization`)
   }
 
   return processChallengeRW({
@@ -72,7 +71,7 @@ export async function processChallengeRW(opts: ProcessChallengeProps) {
       log("authz", authz);
       log("challenges", challenges);
       log("auths", auths.map(a => a.challenges));
-      return Promise.reject(`Unable to find challenge for ${domain}`);
+      return handleReject(`Unable to find challenge for ${domain}`);
     }
 
     if (challenge.status === "valid") {
@@ -96,14 +95,15 @@ export async function processChallengeRW(opts: ProcessChallengeProps) {
 
       log(domain + " createDNS", createDNSREcordResult);
       if (createDNSRecordError) {
-        return Promise.reject(createDNSRecordError || "Unable to create DNS record");
+        return handleReject(`${createDNSRecordError.message}. Unable to create DNS record. Please create TXT DNS record "${dnsRecord}: ${keyAuthorization}"`);
       }
     }
 
     const [verifyChallengeError, verifyChallengeResult] = await goPromise(client.verifyChallenge(authz, challenge));
     log(domain + " verify", verifyChallengeResult);
     if (verifyChallengeError) {
-      return Promise.reject(verifyChallengeError || `Unable to verify challange. Please create TXT DNS record "${dnsRecord}: ${keyAuthorization}"`);
+
+      return handleReject(`${verifyChallengeError.message}. Unable to verify challange. Please create TXT DNS record "${dnsRecord}: ${keyAuthorization}"`);
     }
 
 
@@ -111,17 +111,17 @@ export async function processChallengeRW(opts: ProcessChallengeProps) {
     const [completeChallangeError, completeChallangeResult] = await goPromise(client.completeChallenge(challenge));
     log(domain + " completed", completeChallangeResult)
     if (completeChallangeError || !completeChallangeResult) {
-      return Promise.reject(completeChallangeError || "Unable to complete challange");
+      return handleReject(completeChallangeError || "Unable to complete challange");
     }
 
     /* Wait for ACME provider to respond with valid status */
     const [waitForValidateError, waitForValidateResult] = await goPromise(client.waitForValidStatus(challenge));
     log(domain + " statusChange", waitForValidateResult);
     if (waitForValidateError || !waitForValidateResult) {
-      return Promise.reject(waitForValidateError || "Unable to wait for valid status");
+      return handleReject(waitForValidateError || "Unable to wait for valid status");
     }
     if (waitForValidateResult.status !== "valid") {
-      return Promise.reject(`ACME verification status must be valid. Current status ${waitForValidateResult.status}`)
+      return handleReject(`ACME verification status must be valid. Current status ${waitForValidateResult.status}`)
     }
 
     const dnsClient = DNSClient.get(challenge.type);
@@ -129,7 +129,7 @@ export async function processChallengeRW(opts: ProcessChallengeProps) {
       // const [removeDNSRecordError] = 
       await goPromise(dnsClient.removeRecord({ domain, dnsRecord, token: challenge.token }));
       // if (removeDNSRecordError) {
-      //   return Promise.reject(removeDNSRecordError || "Unable to remove")
+      //   return handleReject(removeDNSRecordError || "Unable to remove")
       // }
     }
   }
@@ -148,9 +148,9 @@ export async function processChallengeRW(opts: ProcessChallengeProps) {
         altNames: altNames
       }));
 
-      log(domain + " createCSR", createCSRResult);
+      log(domain + " createCSR", createCSRResult?.length);
       if (createCSRError || !createCSRResult) {
-        return Promise.reject(createCSRError || "Unable to createCSR");
+        return handleReject(createCSRError || "Unable to createCSR");
       }
 
       const [key, csr] = createCSRResult;
@@ -162,18 +162,18 @@ export async function processChallengeRW(opts: ProcessChallengeProps) {
     let [finalizeOrderError, finalizeOrderResult] = await goPromise(client.finalizeOrder(order, csrKey));
     log(domain + " finalizeOrder", !!finalizeOrderResult)
     if (finalizeOrderError || !finalizeOrderResult) {
-      return Promise.reject(finalizeOrderError || "Unable to finalize order");
+      return handleReject(`${finalizeOrderError?.message || ""}. Unable to finalize order`);
     }
 
     if (["ready", "pending", "processing"].indexOf(finalizeOrderResult.status) !== -1) {
-      return Promise.reject(`finalizeOrder.status must be ready/valid. Current status ${finalizeOrderResult.status}`)
+      return handleReject(`finalizeOrder.status must be ready/valid. Current status ${finalizeOrderResult.status}`)
     }
   }
 
   const [getCertError, getCertResult] = await goPromise(client.getCertificate(order));
   log(domain + " getCertificate", !!getCertResult);
   if (getCertError || !getCertResult) {
-    return Promise.reject(getCertError || "Unable to get certificate");
+    return handleReject(getCertError || "Unable to get certificate");
   }
 
   certificate.save(domain, `cert.pem`, getCertResult);
@@ -183,13 +183,13 @@ export async function processChallengeRW(opts: ProcessChallengeProps) {
   }));
   log(domain + " saveDomain");
   if (insertDomainError) {
-    return Promise.reject(insertDomainError)
+    return handleReject(insertDomainError)
   }
 
   // Don't remove challange so in case the cert is removed, it can be request again
   // const [removeChallangeError] = await goPromise(store.remove("challenge", domain));
   // log(domain + " removeChallenge");
   // if (removeChallangeError) {
-  //   return Promise.reject(removeChallangeError)
+  //   return handleReject(removeChallangeError)
   // }
 }

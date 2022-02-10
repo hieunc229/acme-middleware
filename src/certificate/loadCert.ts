@@ -42,28 +42,34 @@ export async function loadCert(originalDomain: string, options?: LoadCertOptions
 
   if (!exists) {
 
-    if (options?.validateDomain) {
+    // TODO: 
+    // - Remove automatically create certificate
+    // - API to add domain, use it to schedule renewal
+    return Promise.reject("Cert not found");
 
-      const [validateError, validateResult] = await goPromise(options.validateDomain({ domain: originalDomain, nonSubDomain }));
+    // if (options?.validateDomain) {
+      
 
-      if (validateError) {
-        return Promise.reject(validateError)
-      }
+    //   const [validateError, validateResult] = await goPromise(options.validateDomain({ domain: originalDomain, nonSubDomain }));
 
-      if (!validateResult) {
-        return Promise.reject(`Domain ${domain} isn't supported`)
-      }
-    }
+    //   if (validateError) {
+    //     return Promise.reject(validateError)
+    //   }
 
-    let altNames;
+    //   if (!validateResult) {
+    //     return Promise.reject(`Domain ${domain} isn't supported`)
+    //   }
+    // }
 
-    if (!options?.wildcardExcludes?.includes(domain) && (domain === nonSubDomain || domain.indexOf(ACME_PATH.substr(1)) === 0)) {
-      altNames = [`*.${domain}`];
-    }
+    // let altNames;
 
-    let request = await createCertAuto({ domain, email: options?.email, altNames });
-    key = request[0]
-    cert = request[1]
+    // if (!options?.wildcardExcludes?.includes(domain) && (domain === nonSubDomain || domain.indexOf(ACME_PATH.substr(1)) === 0)) {
+    //   altNames = [`*.${domain}`];
+    // }
+
+    // let request = await createCertAuto({ domain, email: options?.email, altNames });
+    // key = request[0]
+    // cert = request[1]
   }
 
   return tls.createSecureContext({

@@ -18,12 +18,10 @@ class _dnsClients {
   private _client: { [type in AcmeDNSClientType]?: AcmeDNSClientAbstract } = {};
 
   get(type: AcmeDNSClientType){
-    console.log("get", type);
     return this._client[type];
   }
 
   set(type: AcmeDNSClientType, client: AcmeDNSClientAbstract)  {
-    console.log("set", type);
     this._client[type] = client;
   }
 }

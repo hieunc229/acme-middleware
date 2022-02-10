@@ -24,7 +24,10 @@ export async function createCertAuto(props: CreateChallengeProps) {
     return Promise.reject(clientError)
   }
 
-  const [createCSRError, CSRResult] = await goPromise(acme.forge.createCsr({ commonName: domain }));
+  const [createCSRError, CSRResult] = await goPromise(acme.forge.createCsr({
+    commonName: domain,
+    altNames: [domain.indexOf("www.") === 0 ? `www.${domain}` : domain.replace("www.", "")]
+  }));
 
   log(domain + " createCSR:", CSRResult);
   if (!CSRResult || createCSRError !== null) {
@@ -32,6 +35,7 @@ export async function createCertAuto(props: CreateChallengeProps) {
   }
 
   const [key, csr] = CSRResult;
+  // let cert = "" as any;
 
   /* Certificate */
   const [createCertError, cert] = await goPromise(client.auto({
@@ -45,6 +49,7 @@ export async function createCertAuto(props: CreateChallengeProps) {
   log(domain + " createCert:", cert);
 
   if (!cert || createCertError) {
+    log(domain + "error", createCertError);
     return Promise.reject(createCertError)
   }
 
@@ -57,7 +62,7 @@ export async function createCertAuto(props: CreateChallengeProps) {
     expire: getFutureDate(90).toJSON()
   }));
 
-  if (!setDomainError !== null) {
+  if (setDomainError !== null) {
     return Promise.reject(setDomainError)
   }
 

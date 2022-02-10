@@ -42,3 +42,8 @@ export function log(...args: any[]) {
     }
   }
 }
+
+export function handleReject(reason: any) {
+  log(`[reject]: ${reason}`);
+  return Promise.reject(reason);
+}

@@ -120,6 +120,7 @@ export async function createChallenge(props: CreateChallengeProps) {
 
   log("09. processChallengeRW")
 
+  // TODO: save output.challange info. Otherwise, can't access /wildcard/info?domain=xxx.xxx
   let [processError] = await goPromise(processChallengeRW({
     altNames,
     domain,
