@@ -1,11 +1,8 @@
 import tls from "tls";
 import certificate from './certificate';
 
-import { ACME_PATH } from "../AcmeExpress";
 import { getDomainName } from "./domainUtils";
-import { createCertAuto } from "../functions/createAuto";
 import { log } from "./utils";
-import goPromise from "go-promise";
 
 export type ValidateDomainFn = (options: { domain: string, nonSubDomain: string }) => Promise<boolean>
 
@@ -34,7 +31,7 @@ export async function loadCert(originalDomain: string, options?: LoadCertOptions
      })
   }
 
-  const exists = certificate.exists(domain, `cert.pem`);
+  const exists = certificate.exists(nonSubDomain, `cert.pem`);
 
   log("01. Load cert", { nonSubDomain, exists, domain: originalDomain, certDomain: domain });
 
@@ -73,7 +70,7 @@ export async function loadCert(originalDomain: string, options?: LoadCertOptions
   }
 
   return tls.createSecureContext({
-    key: key || certificate.load(domain, `key.pem`),
-    cert: cert || certificate.load(domain, `cert.pem`)
+    key: key || certificate.load(nonSubDomain, `key.pem`),
+    cert: cert || certificate.load(nonSubDomain, `cert.pem`)
   })
 }
