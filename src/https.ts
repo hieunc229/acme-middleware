@@ -6,11 +6,13 @@ import { log } from "./certificate/utils";
 import { checkDefaultCert } from './certificate/defaultCert';
 import { loadCert, LoadCertOptions } from './certificate/loadCert';
 
+import { Express } from "express";
+
 const localCertPath = getAcmePath("default/cert.pem")
 const localKeyPath = getAcmePath("default/key.pem");
 
 
-export default function createSSLServer(app: any, options: LoadCertOptions) {
+export default function createSSLServer(app: Express, options: LoadCertOptions) {
 
   checkDefaultCert(localCertPath, localKeyPath);
 

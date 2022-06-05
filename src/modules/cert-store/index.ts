@@ -193,7 +193,7 @@ export default class KnexCertStore {
           if (rs.length) {
             resolve(rs.map(item => restoreJSONProperties(item, defaultOptions.domains.jsonProperties)) as any)
           } else {
-            reject("Domain not found")
+            reject("No certificate record found")
           }
 
         })
