@@ -17,19 +17,22 @@ export async function createCertAuto(props: CreateChallengeProps) {
 
   log(domain + "01. Create cert auto", domain);
 
+
   const [clientError, client] = await goPromise(getClient(email));
 
   log(domain + " getClient:", !!client);
   if (!client || clientError !== null) {
     return Promise.reject(clientError)
   }
+  let commonName = `www.${domain}`;
+  let altNames = [domain];
 
   const [createCSRError, CSRResult] = await goPromise(acme.forge.createCsr({
-    commonName: domain,
-    altNames: [domain.indexOf("www.") === 0 ? `www.${domain}` : domain.replace("www.", "")]
+    commonName, altNames
   }));
 
   log(domain + " createCSR:", CSRResult);
+
   if (!CSRResult || createCSRError !== null) {
     return Promise.reject(createCSRError)
   }
