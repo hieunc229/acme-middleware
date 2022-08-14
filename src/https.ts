@@ -11,6 +11,7 @@ import { Express } from "express";
 const localCertPath = getAcmePath("default/cert.pem")
 const localKeyPath = getAcmePath("default/key.pem");
 
+const IPRegex = /\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}\b/;
 
 export default function createSSLServer(app: Express, options: LoadCertOptions) {
 
@@ -18,6 +19,10 @@ export default function createSSLServer(app: Express, options: LoadCertOptions) 
 
   const server = https.createServer({
     SNICallback: (servername, cb) => {
+
+      if (IPRegex.test(servername)) {
+        return cb(new Error("Not supporting for IP address"));
+      }
 
       if (servername === "localhost") {
         localCertCB(cb);
