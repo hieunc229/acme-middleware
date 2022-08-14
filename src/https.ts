@@ -29,8 +29,14 @@ export default function createSSLServer(app: Express, options: LoadCertOptions) 
         return;
       }
 
+      if (/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(servername)) {
+        cb(new Error("Invalid name"))
+        return;
+      }
+
       loadCert(servername, options)
         .then(ctx => {
+          console.log(ctx);
           cb(null, ctx)
         })
         .catch(err => {
