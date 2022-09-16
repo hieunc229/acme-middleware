@@ -143,7 +143,7 @@ export async function processChallengeRW(opts: ProcessChallengeProps) {
     if (certificate.exists(domain, "key.csr")) {
       csrKey = certificate.load(domain, "key.csr");
     } else {
-      const [createCSRError, createCSRResult] = await goPromise(acme.forge.createCsr({
+      const [createCSRError, createCSRResult] = await goPromise(acme.crypto.createCsr({
         commonName: domain,
         altNames: altNames
       }));

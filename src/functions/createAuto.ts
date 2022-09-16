@@ -25,9 +25,14 @@ export async function createCertAuto(props: CreateChallengeProps) {
     return Promise.reject(clientError)
   }
   let commonName = domain;
-  let altNames: string[] = [];//[`www.${domain}`];
 
-  const [createCSRError, CSRResult] = await goPromise(acme.forge.createCsr({
+  if (commonName.indexOf("www.")) {
+    commonName = commonName.replace("www.", "")
+  }
+
+  let altNames: string[] = [`www.${domain}`];
+
+  const [createCSRError, CSRResult] = await goPromise(acme.crypto.createCsr({
     commonName,
     altNames
   }));

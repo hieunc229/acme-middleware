@@ -15,7 +15,7 @@ async function getOrCreateKey(): Promise<[Buffer, boolean]> {
     const keyPath = getAcmePath("accountKey.pem");
 
     if (!fs.existsSync(keyPath)) {
-        let strBuff = await acme.forge.createPrivateKey();
+        let strBuff = await acme.crypto.createPrivateKey();
         fs.writeFileSync(keyPath, strBuff);
         accountKey = strBuff;
         created = false;

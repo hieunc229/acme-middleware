@@ -13,10 +13,10 @@ export async function checkDefaultCert(certhPath: string, keyPath: string) {
     log("02. Default Cert not exists. Create one");
 
     // https://github.com/publishlab/node-acme-client/blob/master/docs/forge.md#createCsr
-    const privateKey = await acme.forge.createPrivateKey();
-    const publicKey = await acme.forge.createPublicKey(privateKey);
+    const privateKey = await acme.crypto.createPrivateKey();
+    const publicKey = acme.crypto.getPublicKey(privateKey);
 
-    const [_, certificateCsr] = await acme.forge.createCsr({
+    const [_, certificateCsr] = await acme.crypto.createCsr({
       commonName: 'localhost',
       altNames: ['localhost']
     }, privateKey);
